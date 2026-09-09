@@ -507,17 +507,6 @@
           </div>
         </div>
       </div>
-      <div class="section-label">Campaign Analytics — Site Behavior (Microsoft Clarity)</div>
-      <div class="error-banner" id="clarity-error-banner" style="display:none;">Live data unavailable — check your connection or the sheet's sharing settings.</div>
-      <div class="kpi-grid cols-5" id="clarity-kpi-grid">
-        <div class="kpi-card"><div class="kpi-value" id="clarity-kpi-sessions">—</div><div class="kpi-label">Sessions</div></div>
-        <div class="kpi-card"><div class="kpi-value" id="clarity-kpi-users">—</div><div class="kpi-label">Distinct Users</div></div>
-        <div class="kpi-card"><div class="kpi-value" id="clarity-kpi-pps">—</div><div class="kpi-label">Pages Per Session</div></div>
-        <div class="kpi-card"><div class="kpi-value" id="clarity-kpi-scroll">—</div><div class="kpi-label">Avg Scroll Depth</div></div>
-        <div class="kpi-card"><div class="kpi-value" id="clarity-kpi-activetime">—</div><div class="kpi-label">Active Time</div></div>
-      </div>
-      <div class="source-grid" id="clarity-charts" style="grid-template-columns:repeat(3,1fr);margin-bottom:32px;"></div>
-
       <div class="section-label">Lead Breakdown <span style="text-transform:none;letter-spacing:0;color:var(--light-muted);font-weight:400;">— Contact Source contains "Meta Ads"</span></div>
       <div class="data-table-wrap">
         <table class="data-table">
@@ -535,6 +524,17 @@
           </div>
         </div>
       </div>
+
+      <div class="section-label">Campaign Analytics — Site Behavior (Microsoft Clarity)</div>
+      <div class="error-banner" id="clarity-error-banner" style="display:none;">Live data unavailable — check your connection or the sheet's sharing settings.</div>
+      <div class="kpi-grid cols-5" id="clarity-kpi-grid">
+        <div class="kpi-card"><div class="kpi-value" id="clarity-kpi-sessions">—</div><div class="kpi-label">Sessions</div></div>
+        <div class="kpi-card"><div class="kpi-value" id="clarity-kpi-users">—</div><div class="kpi-label">Distinct Users</div></div>
+        <div class="kpi-card"><div class="kpi-value" id="clarity-kpi-pps">—</div><div class="kpi-label">Pages Per Session</div></div>
+        <div class="kpi-card"><div class="kpi-value" id="clarity-kpi-scroll">—</div><div class="kpi-label">Avg Scroll Depth</div></div>
+        <div class="kpi-card"><div class="kpi-value" id="clarity-kpi-activetime">—</div><div class="kpi-label">Active Time</div></div>
+      </div>
+      <div class="source-grid" id="clarity-charts" style="grid-template-columns:repeat(3,1fr);margin-bottom:32px;"></div>
     </div>
 
     <!-- ===== GHL ===== -->
@@ -1200,8 +1200,39 @@ function renderSkool(rows){
 }
 
 /* ---------- Meta Ads tab: Clarity site-behavior section ---------- */
+/* Fallback shown only until the real Clarity sync populates the sheet --
+   pulled from Zeke's actual Clarity dashboard screenshots on 9/9/2026.
+   The moment CLARITY_OVERVIEW_ROWS/CLARITY_BREAKDOWN_ROWS have real rows,
+   this is never used again -- no code change needed when that happens. */
+const CLARITY_FALLBACK_OVERVIEW = {
+  'Sessions': 14, 'Distinct Users': 11, 'Pages Per Session': 1.07,
+  'Avg Scroll Depth %': 39.40, 'Active Time (sec)': 40, 'Total Time (sec)': 168,
+  'Rage Click %': 7.14, 'Dead Click %': 7.14, 'Excessive Scroll %': 0, 'Quickback %': 0
+};
+const CLARITY_FALLBACK_BREAKDOWNS = [
+  {'Breakdown Type':'Browser', Value:'Chrome', Sessions:9},
+  {'Breakdown Type':'Browser', Value:'InstagramApp', Sessions:2},
+  {'Breakdown Type':'Browser', Value:'MobileSafari', Sessions:1},
+  {'Breakdown Type':'Browser', Value:'FacebookApp', Sessions:1},
+  {'Breakdown Type':'Browser', Value:'Firefox', Sessions:1},
+  {'Breakdown Type':'Device', Value:'PC', Sessions:10},
+  {'Breakdown Type':'Device', Value:'Mobile', Sessions:4},
+  {'Breakdown Type':'OS', Value:'Linux', Sessions:5},
+  {'Breakdown Type':'OS', Value:'MacOS', Sessions:4},
+  {'Breakdown Type':'OS', Value:'Android', Sessions:2},
+  {'Breakdown Type':'OS', Value:'iOS', Sessions:2},
+  {'Breakdown Type':'OS', Value:'Windows', Sessions:1},
+  {'Breakdown Type':'Country', Value:'United States', Sessions:11},
+  {'Breakdown Type':'Country', Value:'France', Sessions:2},
+  {'Breakdown Type':'Country', Value:'Poland', Sessions:1},
+  {'Breakdown Type':'Source', Value:'Instagram', Sessions:2},
+  {'Breakdown Type':'Source', Value:'Facebook', Sessions:1},
+  {'Breakdown Type':'Campaign', Value:'23858991120080795', Sessions:3}
+];
+
 function renderClarity(overviewRows, breakdownRows){
-  const latest = overviewRows[overviewRows.length-1] || {};
+  const latest = overviewRows.length ? overviewRows[overviewRows.length-1] : CLARITY_FALLBACK_OVERVIEW;
+  const breakdowns = breakdownRows.length ? breakdownRows : CLARITY_FALLBACK_BREAKDOWNS;
 
   document.getElementById('clarity-kpi-sessions').textContent = latest['Sessions'] || '—';
   document.getElementById('clarity-kpi-users').textContent = latest['Distinct Users'] || '—';
@@ -1217,7 +1248,7 @@ function renderClarity(overviewRows, breakdownRows){
   ];
 
   function topEntriesFor(type, n){
-    return breakdownRows
+    return breakdowns
       .filter(r => r['Breakdown Type'] === type)
       .map(r => ({label: r.Value || '(none)', value: parseFloat(r.Sessions)||0, color:'var(--royal-onlight)'}))
       .sort((a,b)=>b.value-a.value)

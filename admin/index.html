@@ -593,8 +593,8 @@ const CONFIG = {
     ghl: "1236574858",
     meta: "1546102081",
     skool: "300221671",
-    clarityOverview: "PASTE_GID_HERE",
-    clarityBreakdowns: "PASTE_GID_HERE"
+    clarityOverview: "424093640",
+    clarityBreakdowns: "986846742"
   },
   /* A GHL opportunity counts as Meta-sourced only if its Contact Source
      contains this text. Adjust here if the tag wording changes. */
@@ -625,6 +625,7 @@ const pwError = document.getElementById('pw-error');
 
 function attemptLogin(){
   if(pwInput.value === CONFIG.password){
+    localStorage.setItem('c2c_access_granted', '1');
     pwScreen.classList.add('hidden');
     startLoading();
   } else {
@@ -635,6 +636,11 @@ function attemptLogin(){
 }
 document.getElementById('pw-submit').addEventListener('click', attemptLogin);
 pwInput.addEventListener('keydown', e=>{ if(e.key==='Enter') attemptLogin(); });
+
+if(localStorage.getItem('c2c_access_granted') === '1'){
+  pwScreen.classList.add('hidden');
+  startLoading();
+}
 
 /* ---------- Ambient scanning background (password screen) ---------- */
 const canvas = document.getElementById('bg-canvas');
@@ -949,11 +955,13 @@ function applyFilterAndRenderAll(){
   const ghlRows = filterByDate(GHL_ROWS, 'Created At');
   const metaRows = filterByDate(META_ROWS, 'Date');
   const skoolRows = filterByDate(SKOOL_ROWS, 'Date');
+  const clarityOverviewRows = filterByDate(CLARITY_OVERVIEW_ROWS, 'Date');
+  const clarityBreakdownRows = filterByDate(CLARITY_BREAKDOWN_ROWS, 'Date');
   const ghlSummary = renderGHL(ghlRows);
   const metaSummary = renderMetaAds(metaRows, ghlRows);
   const skoolSummary = renderSkool(skoolRows);
   renderOverview(ghlRows, ghlSummary, metaSummary, skoolSummary);
-  renderClarity(CLARITY_OVERVIEW_ROWS, CLARITY_BREAKDOWN_ROWS);
+  renderClarity(clarityOverviewRows, clarityBreakdownRows);
 }
 
 /* ---------- GHL tab ---------- */
@@ -1054,13 +1062,13 @@ function renderGHL(rows){
 
 /* ---------- Meta Ads tab ---------- */
 function renderMetaAds(rows, ghlRows){
-  let totalSpend = 0, totalLeads = 0;
+  let totalSpend = 0;
   rows.forEach(r=>{
     totalSpend += parseFloat(r.Spend) || 0;
-    totalLeads += parseFloat(r.Leads) || 0;
   });
 
   const metaOpps = ghlRows.filter(isMetaSourced);
+  const totalLeads = metaOpps.length; // Leads counted from GHL (Contact Source), not Meta's own platform count
   const customers = metaOpps.filter(r=>{
     const stage = r['Normalized Stage'] || normalizeStage(r['Raw Stage']);
     return stage === 'Closed Won';
@@ -1248,9 +1256,13 @@ function renderClarity(overviewRows, breakdownRows){
   ];
 
   function topEntriesFor(type, n){
-    return breakdowns
-      .filter(r => r['Breakdown Type'] === type)
-      .map(r => ({label: r.Value || '(none)', value: parseFloat(r.Sessions)||0, color:'var(--royal-onlight)'}))
+    const totals = {};
+    breakdowns.filter(r => r['Breakdown Type'] === type).forEach(r=>{
+      const key = r.Value || '(none)';
+      totals[key] = (totals[key]||0) + (parseFloat(r.Sessions)||0);
+    });
+    return Object.keys(totals)
+      .map(k => ({label:k, value:totals[k], color:'var(--royal-onlight)'}))
       .sort((a,b)=>b.value-a.value)
       .slice(0, n || 5);
   }

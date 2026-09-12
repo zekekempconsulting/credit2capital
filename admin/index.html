@@ -534,7 +534,7 @@
         </div>
       </div>
       <div class="data-table-wrap" style="padding:20px 22px;">
-        <div style="position:relative;height:170px;">
+        <div style="position:relative;height:260px;">
           <canvas id="meta-leads-chart-canvas"></canvas>
         </div>
       </div>
@@ -843,6 +843,20 @@ function normalizeStage(raw){
 }
 function isMetaSourced(row){
   return (row['Contact Source']||'').toLowerCase().includes(CONFIG.metaSourceTag);
+}
+
+/* TEMPORARY: manual GHL edits for these two haven't synced to the sheet yet
+   (cache + daily quota). This feeds BOTH the Lead Breakdown table display
+   AND the % Qualified Leads KPI card, so they stay consistent with each
+   other. Safe to delete once a real sync brings their real classification
+   in -- at that point this just re-affirms the same value. */
+const FUNNEL_OVERRIDES = { 'janice low': 'Qualified Lead', 'ricky burrell': 'Qualified Lead' };
+function getEffectiveFunnelClassification(r){
+  const nameKey = (r['Opportunity Name']||'').toLowerCase();
+  for(const key in FUNNEL_OVERRIDES){
+    if(nameKey.includes(key)) return FUNNEL_OVERRIDES[key];
+  }
+  return (r['Funnel Classification']||'').trim();
 }
 
 /* ---------- Small chart helpers (no external chart library, brand colors only) ---------- */
@@ -1416,10 +1430,9 @@ function renderMetaAds(rows, ghlRows){
   /* Funnel Classification dropdown values (GHL): Unqualified, Qualified Lead,
      Sales-Ready Opportunity, Client. "Qualified" and "Sales-Ready" counts
      include anyone who has progressed PAST that point in the funnel too. */
-  const classOf = r => (r['Funnel Classification']||'').trim();
-  const hasAnyClassification = metaOpps.some(r => classOf(r) !== '');
-  const qualifiedOrBeyond = metaOpps.filter(r => ['Qualified Lead','Sales-Ready Opportunity','Client'].includes(classOf(r))).length;
-  const salesReadyOrBeyond = metaOpps.filter(r => ['Sales-Ready Opportunity','Client'].includes(classOf(r))).length;
+  const hasAnyClassification = metaOpps.some(r => getEffectiveFunnelClassification(r) !== '');
+  const qualifiedOrBeyond = metaOpps.filter(r => ['Qualified Lead','Sales-Ready Opportunity','Client'].includes(getEffectiveFunnelClassification(r))).length;
+  const salesReadyOrBeyond = metaOpps.filter(r => ['Sales-Ready Opportunity','Client'].includes(getEffectiveFunnelClassification(r))).length;
 
   // Blank (not 0%) when there's no signal yet for that specific stage.
   const pctQualified = (metaOpps.length && hasAnyClassification) ? Math.round((qualifiedOrBeyond/metaOpps.length)*100) : null;
@@ -1483,19 +1496,10 @@ function renderMetaAds(rows, ghlRows){
   if(sortedLeads.length === 0){
     leadBody.innerHTML = '<tr><td colspan="8" style="text-align:center;color:var(--light-muted);font-family:Inter,sans-serif;">No leads with "Meta Ads" in Contact Source yet.</td></tr>';
   } else {
-    /* TEMPORARY: manual GHL edits for these two haven't synced to the sheet
-       yet (cache + today's quota). Display override only, for today's client
-       review -- safe to delete once tomorrow's sync brings in the real data,
-       since it'll just show the same value at that point anyway. */
-    const FUNNEL_OVERRIDES = { 'janice low': 'Qualified Lead', 'ricky burrow': 'Qualified Lead' };
     leadPage.forEach(r=>{
       const stage = r['Normalized Stage'] || normalizeStage(r['Raw Stage']);
       const created = r['Created At'] ? new Date(r['Created At']).toLocaleDateString() : '—';
-      const nameKey = (r['Opportunity Name']||'').toLowerCase();
-      let funnelDisplay = r['Funnel Classification'] || '—';
-      for(const key in FUNNEL_OVERRIDES){
-        if(nameKey.includes(key)){ funnelDisplay = FUNNEL_OVERRIDES[key]; break; }
-      }
+      const funnelDisplay = getEffectiveFunnelClassification(r) || '—';
       leadBody.innerHTML += `<tr><td class="name-cell">${r['Opportunity Name']||r['Contact ID']||'—'}</td><td>${created}</td><td>${r.Rep||'—'}</td><td>${r.Status||'—'}</td><td>${stage}</td><td>${funnelDisplay}</td><td>${r.Tags||'—'}</td><td>$${(parseFloat(r['Monetary Value'])||0).toLocaleString()}</td></tr>`;
     });
   }

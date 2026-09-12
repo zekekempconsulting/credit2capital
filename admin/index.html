@@ -521,7 +521,7 @@
         <div class="kpi-card gold"><div class="kpi-value" id="meta-kpi-customers">—</div><div class="kpi-label">Customers</div></div>
         <div class="kpi-card gold"><div class="kpi-value" id="meta-kpi-cac">—</div><div class="kpi-label">Cost Per Acquisition</div></div>
       </div>
-      <div class="section-label">Leads &amp; Customers Over Time</div>
+      <div class="section-label" style="margin-top:48px;">Leads &amp; Customers Over Time</div>
       <div class="filter-toggle-wrap">
         <button class="filter-toggle-btn" data-toggles="meta-chart-subfilter">Filter <span class="chev">▾</span></button>
         <div class="chart-subfilter collapsed" id="meta-chart-subfilter">
@@ -534,7 +534,7 @@
         </div>
       </div>
       <div class="data-table-wrap" style="padding:20px 22px;">
-        <div style="position:relative;height:260px;">
+        <div style="position:relative;height:290px;">
           <canvas id="meta-leads-chart-canvas"></canvas>
         </div>
       </div>
@@ -1421,8 +1421,23 @@ function renderMetaAds(rows, ghlRows){
   });
 
   const metaOpps = ghlRows.filter(isMetaSourced);
-  const totalLeads = metaOpps.length; // Leads counted from GHL (Contact Source), not Meta's own platform count
-  const customers = metaOpps.filter(r=>{
+
+  // Dedup by CONTACT once, up front -- one person can have more than one
+  // opportunity (e.g. re-entering the pipeline), which was inflating every
+  // count below (Leads, Customers, % Qualified) past what GHL and Ads
+  // Manager show, since those correctly count people, not opportunity rows.
+  const byContact = {};
+  metaOpps.forEach(r=>{
+    const cid = r['Contact ID'] || r['Opportunity ID'] || r['Opportunity Name'];
+    const existing = byContact[cid];
+    if(!existing || new Date(r['Created At']) > new Date(existing['Created At'])){
+      byContact[cid] = r;
+    }
+  });
+  const uniqueMetaLeads = Object.values(byContact);
+
+  const totalLeads = uniqueMetaLeads.length; // Leads counted from GHL (Contact Source), not Meta's own platform count
+  const customers = uniqueMetaLeads.filter(r=>{
     const stage = r['Normalized Stage'] || normalizeStage(r['Raw Stage']);
     return stage === 'Closed Won';
   }).length;
@@ -1430,12 +1445,12 @@ function renderMetaAds(rows, ghlRows){
   /* Funnel Classification dropdown values (GHL): Unqualified, Qualified Lead,
      Sales-Ready Opportunity, Client. "Qualified" and "Sales-Ready" counts
      include anyone who has progressed PAST that point in the funnel too. */
-  const hasAnyClassification = metaOpps.some(r => getEffectiveFunnelClassification(r) !== '');
-  const qualifiedOrBeyond = metaOpps.filter(r => ['Qualified Lead','Sales-Ready Opportunity','Client'].includes(getEffectiveFunnelClassification(r))).length;
-  const salesReadyOrBeyond = metaOpps.filter(r => ['Sales-Ready Opportunity','Client'].includes(getEffectiveFunnelClassification(r))).length;
+  const hasAnyClassification = uniqueMetaLeads.some(r => getEffectiveFunnelClassification(r) !== '');
+  const qualifiedOrBeyond = uniqueMetaLeads.filter(r => ['Qualified Lead','Sales-Ready Opportunity','Client'].includes(getEffectiveFunnelClassification(r))).length;
+  const salesReadyOrBeyond = uniqueMetaLeads.filter(r => ['Sales-Ready Opportunity','Client'].includes(getEffectiveFunnelClassification(r))).length;
 
   // Blank (not 0%) when there's no signal yet for that specific stage.
-  const pctQualified = (metaOpps.length && hasAnyClassification) ? Math.round((qualifiedOrBeyond/metaOpps.length)*100) : null;
+  const pctQualified = (uniqueMetaLeads.length && hasAnyClassification) ? Math.round((qualifiedOrBeyond/uniqueMetaLeads.length)*100) : null;
   const pctSalesReady = (qualifiedOrBeyond && salesReadyOrBeyond) ? Math.round((salesReadyOrBeyond/qualifiedOrBeyond)*100) : null;
 
   const cpl = totalLeads ? (totalSpend/totalLeads) : 0;
@@ -1477,19 +1492,8 @@ function renderMetaAds(rows, ghlRows){
   document.getElementById('meta-campaign-pageinfo').textContent =
     rows.length ? `Showing ${campaignPage.length} of ${sortedRows.length}` : '';
 
-  // One row per CONTACT, not per opportunity -- a contact can have more than
-  // one opportunity (e.g. re-entering the funnel), which showed as duplicates.
-  // Keep whichever of that contact's opportunities was created most recently.
-  const byContact = {};
-  metaOpps.forEach(r=>{
-    const cid = r['Contact ID'] || r['Opportunity ID'] || r['Opportunity Name'];
-    const existing = byContact[cid];
-    if(!existing || new Date(r['Created At']) > new Date(existing['Created At'])){
-      byContact[cid] = r;
-    }
-  });
-  const dedupedLeads = Object.values(byContact);
-  const sortedLeads = dedupedLeads.sort((a,b)=> new Date(b['Created At']) - new Date(a['Created At']));
+  // Table just sorts the already-deduped list computed above.
+  const sortedLeads = [...uniqueMetaLeads].sort((a,b)=> new Date(b['Created At']) - new Date(a['Created At']));
   const leadPage = sortedLeads.slice(0, metaLeadPageSize);
   const leadBody = document.getElementById('meta-lead-body');
   leadBody.innerHTML = '';

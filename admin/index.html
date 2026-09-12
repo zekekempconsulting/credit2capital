@@ -189,6 +189,14 @@
     border:1px solid rgba(224,101,79,0.35); border-radius:10px; padding:10px 14px; margin-bottom:20px;
   }
 
+  .chart-subfilter{
+    display:flex; gap:8px; flex-wrap:wrap; margin-bottom:14px;
+  }
+  .funnel-definitions{
+    font-size:12.5px; color:var(--light-muted); line-height:1.7;
+    margin:-10px 0 32px; padding:0 2px;
+  }
+  .funnel-definitions strong{ color:var(--light-ink); font-weight:600; }
   .date-filter-bar{
     display:flex; align-items:center; gap:10px; flex-wrap:wrap;
     margin-bottom:28px; padding:14px 16px;
@@ -490,6 +498,19 @@
         <div class="kpi-card gold"><div class="kpi-value" id="meta-kpi-customers">—</div><div class="kpi-label">Customers</div></div>
         <div class="kpi-card gold"><div class="kpi-value" id="meta-kpi-cac">—</div><div class="kpi-label">Cost Per Acquisition</div></div>
       </div>
+      <div class="section-label">Leads &amp; Customers Over Time</div>
+      <div class="chart-subfilter" id="meta-chart-subfilter">
+        <button class="date-pill active" data-chartrange="sync">Match Main Filter</button>
+        <button class="date-pill" data-chartrange="today">Today</button>
+        <button class="date-pill" data-chartrange="7d">7 Days</button>
+        <button class="date-pill" data-chartrange="30d">30 Days</button>
+        <button class="date-pill" data-chartrange="mtd">This Month</button>
+        <button class="date-pill" data-chartrange="all">All Time</button>
+      </div>
+      <div class="data-table-wrap" style="padding:22px 22px 16px;">
+        <div id="meta-leads-chart"></div>
+      </div>
+
       <div class="section-label">Campaign Breakdown</div>
       <div class="data-table-wrap">
         <table class="data-table">
@@ -507,11 +528,11 @@
           </div>
         </div>
       </div>
-      <div class="section-label">Lead Breakdown <span style="text-transform:none;letter-spacing:0;color:var(--light-muted);font-weight:400;">— Contact Source contains "Meta Ads"</span></div>
+      <div class="section-label">Lead Breakdown <span style="text-transform:none;letter-spacing:0;color:var(--light-muted);font-weight:400;">— Contact Source contains "Meta Ads", one row per contact</span></div>
       <div class="data-table-wrap">
         <table class="data-table">
           <thead>
-            <tr><th>Lead</th><th>Rep</th><th>Status</th><th>Stage</th><th>Funnel Classification</th><th>Value</th><th>Created</th></tr>
+            <tr><th>Lead</th><th>Created Date</th><th>Rep</th><th>Status</th><th>Stage</th><th>Funnel Classification</th><th>Tag</th></tr>
           </thead>
           <tbody id="meta-lead-body"></tbody>
         </table>
@@ -523,6 +544,12 @@
             <button class="page-size-btn" data-size="100">100</button>
           </div>
         </div>
+      </div>
+      <div class="funnel-definitions">
+        <strong>Lead:</strong> submits the form. &nbsp;·&nbsp;
+        <strong>Qualified Lead:</strong> provides legitimate contact info, responds to follow-up, and books an appointment. &nbsp;·&nbsp;
+        <strong>Sales-Ready Opportunity:</strong> completes the appointment, meets C2C's qualification criteria, and takes the next required step. &nbsp;·&nbsp;
+        <strong>Client:</strong> purchases or joins the C2C service.
       </div>
 
       <div class="section-label">Campaign Analytics — Site Behavior (Microsoft Clarity)</div>
@@ -625,7 +652,7 @@ const pwError = document.getElementById('pw-error');
 
 function attemptLogin(){
   if(pwInput.value === CONFIG.password){
-    localStorage.setItem('c2c_access_granted', '1');
+    localStorage.setItem('c2c_saved_password', pwInput.value);
     pwScreen.classList.add('hidden');
     startLoading();
   } else {
@@ -637,10 +664,11 @@ function attemptLogin(){
 document.getElementById('pw-submit').addEventListener('click', attemptLogin);
 pwInput.addEventListener('keydown', e=>{ if(e.key==='Enter') attemptLogin(); });
 
-if(localStorage.getItem('c2c_access_granted') === '1'){
-  pwScreen.classList.add('hidden');
-  startLoading();
-}
+// Pre-fill (still masked -- input type is "password") so a returning user
+// on the same device just clicks Enter Dashboard instead of retyping.
+// The screen itself always shows; nothing is auto-skipped.
+const savedPw = localStorage.getItem('c2c_saved_password');
+if(savedPw) pwInput.value = savedPw;
 
 /* ---------- Ambient scanning background (password screen) ---------- */
 const canvas = document.getElementById('bg-canvas');
@@ -686,49 +714,66 @@ function startLoading(){
   ringProgress.style.strokeDasharray = circumference;
   ringProgress.style.strokeDashoffset = circumference;
 
-  const totalDuration = 7000;
   const percentEl = document.getElementById('loading-percent');
+  const textEl = document.getElementById('loading-text');
 
   const texts = [
     'Connecting your data sources',
     'Pulling Meta Ads performance',
     'Pulling GoHighLevel pipeline',
     'Pulling Skool community data',
+    'Pulling site behavior data',
     'Calculating performance metrics',
     'Preparing your dashboard'
   ];
+  let textIndex = 0;
+  const textInterval = setInterval(()=>{
+    textIndex = (textIndex+1) % texts.length;
+    textEl.classList.add('fade');
+    setTimeout(()=>{ textEl.textContent = texts[textIndex]; textEl.classList.remove('fade'); }, 200);
+  }, 1300);
 
+  // Ring eases up to 92% over ~3s and HOLDS there -- it does not reach 100%
+  // on its own. It only completes once the real data fetch actually resolves,
+  // so the dashboard never reveals before the numbers are actually in it.
+  let dataReady = false;
+  let visualPct = 0;
+  const rampDuration = 3000;
   const startTime = performance.now();
+
   function tick(now){
     const elapsed = now - startTime;
-    const pct = Math.min(elapsed / totalDuration, 1);
-    const eased = 1 - Math.pow(1 - pct, 2);
-    percentEl.textContent = Math.round(eased * 100) + '%';
-    ringProgress.style.strokeDashoffset = circumference * (1 - eased);
-    if(pct < 1) requestAnimationFrame(tick);
+    if(!dataReady){
+      const rampProgress = Math.min(elapsed / rampDuration, 1);
+      visualPct = (1 - Math.pow(1 - rampProgress, 2)) * 92;
+      percentEl.textContent = Math.round(visualPct) + '%';
+      ringProgress.style.strokeDashoffset = circumference * (1 - visualPct/100);
+      requestAnimationFrame(tick);
+    }
   }
   requestAnimationFrame(tick);
 
-  const textEl = document.getElementById('loading-text');
-  let i = 0;
-  const stepDuration = totalDuration / texts.length;
-  const textInterval = setInterval(()=>{
-    i++;
-    if(i < texts.length){
-      textEl.classList.add('fade');
-      setTimeout(()=>{
-        textEl.textContent = texts[i];
-        textEl.classList.remove('fade');
-      }, 200);
+  loadDashboardDataAsync().then(()=>{
+    dataReady = true;
+    const finishStart = performance.now();
+    const startPct = visualPct;
+    function finish(now){
+      const t = Math.min((now - finishStart) / 400, 1);
+      const pct = startPct + (100 - startPct) * t;
+      percentEl.textContent = Math.round(pct) + '%';
+      ringProgress.style.strokeDashoffset = circumference * (1 - pct/100);
+      if(t < 1){
+        requestAnimationFrame(finish);
+      } else {
+        clearInterval(textInterval);
+        setTimeout(()=>{
+          loadingScreen.classList.add('hidden');
+          dashboard.classList.add('show');
+        }, 300);
+      }
     }
-  }, stepDuration);
-
-  setTimeout(()=>{
-    clearInterval(textInterval);
-    loadingScreen.classList.add('hidden');
-    dashboard.classList.add('show');
-    loadDashboardData();
-  }, totalDuration + 300);
+    requestAnimationFrame(finish);
+  });
 }
 
 /* ---------- Stage normalization ---------- */
@@ -794,9 +839,44 @@ function svgBarList(items){
     </div>`;
   }).join('<div style="height:10px;"></div>');
 }
+function svgLineChart(seriesList, dateLabels, width, height){
+  width = width || 640; height = height || 220;
+  const padding = {top:14, right:14, bottom:26, left:28};
+  const innerW = width - padding.left - padding.right;
+  const innerH = height - padding.top - padding.bottom;
+  const maxY = Math.max(1, ...seriesList.flatMap(s=>s.values));
+  const n = dateLabels.length;
+  const xAt = i => padding.left + (n<=1 ? innerW/2 : (innerW*i/(n-1)));
+  const yAt = v => padding.top + innerH - (v/maxY)*innerH;
+
+  let svg = `<svg width="100%" viewBox="0 0 ${width} ${height}" preserveAspectRatio="none" style="overflow:visible;display:block;">`;
+  svg += `<line x1="${padding.left}" y1="${padding.top+innerH}" x2="${padding.left+innerW}" y2="${padding.top+innerH}" stroke="rgba(16,26,61,0.15)" stroke-width="1"/>`;
+
+  seriesList.forEach(s=>{
+    const pts = s.values.map((v,i)=>`${xAt(i)},${yAt(v)}`).join(' ');
+    svg += `<polyline points="${pts}" fill="none" stroke="${s.color}" stroke-width="2.5" stroke-linejoin="round" stroke-linecap="round"/>`;
+    s.values.forEach((v,i)=>{ svg += `<circle cx="${xAt(i)}" cy="${yAt(v)}" r="3" fill="${s.color}"/>`; });
+  });
+
+  const labelIdxs = n<=1 ? [0] : [0, Math.floor((n-1)/2), n-1];
+  labelIdxs.forEach(i=>{
+    if(dateLabels[i] === undefined) return;
+    svg += `<text x="${xAt(i)}" y="${height-6}" font-size="11" fill="#5C6690" text-anchor="middle" font-family="Inter,sans-serif">${dateLabels[i]}</text>`;
+  });
+
+  svg += `</svg>`;
+  return svg;
+}
+function chartLegend(items){
+  return `<div style="display:flex;gap:18px;margin-top:6px;flex-wrap:wrap;">${items.map(it=>`
+    <div style="display:flex;align-items:center;gap:6px;font-size:12.5px;color:var(--light-muted);">
+      <span style="width:14px;height:3px;background:${it.color};display:inline-block;border-radius:2px;"></span>${it.label}
+    </div>`).join('')}</div>`;
+}
 
 let GHL_ROWS = [], META_ROWS = [], SKOOL_ROWS = [];
 let CLARITY_OVERVIEW_ROWS = [], CLARITY_BREAKDOWN_ROWS = [];
+let metaChartRange = 'sync';
 let metaCampaignPageSize = 10, metaLeadPageSize = 10;
 let currentRange = 'all';
 
@@ -847,8 +927,8 @@ function fetchSheet(gid){
   });
 }
 
-function loadDashboardData(){
-  Promise.allSettled([
+function loadDashboardDataAsync(){
+  return Promise.allSettled([
     fetchSheet(CONFIG.gids.ghl),
     fetchSheet(CONFIG.gids.meta),
     fetchSheet(CONFIG.gids.skool),
@@ -939,6 +1019,15 @@ document.querySelectorAll('.pagination-controls').forEach(group=>{
   });
 });
 
+document.querySelectorAll('#meta-chart-subfilter .date-pill').forEach(btn=>{
+  btn.addEventListener('click', ()=>{
+    document.querySelectorAll('#meta-chart-subfilter .date-pill').forEach(b=>b.classList.remove('active'));
+    btn.classList.add('active');
+    metaChartRange = btn.dataset.chartrange;
+    renderMetaLeadsChart();
+  });
+});
+
 /* ---------- Tab switching ---------- */
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click', ()=> switchTab(btn.dataset.tab));
@@ -985,7 +1074,22 @@ function renderGHL(rows){
     if(stage === 'Closed Won'){ reps[rep].closed++; reps[rep].revenue += val; }
   });
 
-  const booked = counts['Meeting Booked'] + counts['No Show'] + counts['Rescheduled'] + counts['Closed Won'];
+  /* "Meetings Booked" combines the pipeline stage AND the "appntbooked" tag,
+     deduped by contact -- the tag catches people GHL tagged as booked before
+     a rep manually moved their pipeline stage forward, without double-counting
+     anyone already captured by their stage. */
+  const bookedStages = ['Meeting Booked','No Show','Rescheduled','Closed Won'];
+  let booked = 0;
+  const bookedContacts = new Set();
+  rows.forEach(r=>{
+    const stage = r['Normalized Stage'] || normalizeStage(r['Raw Stage']);
+    const cid = r['Contact ID'] || r['Opportunity Name'];
+    const hasBookedTag = (r.Tags || '').toLowerCase().includes('appntbooked');
+    if((bookedStages.includes(stage) || hasBookedTag) && !bookedContacts.has(cid)){
+      bookedContacts.add(cid);
+      booked++;
+    }
+  });
   const showed = counts['Rescheduled'] + counts['Closed Won'];
   const showRate = booked ? Math.round((showed/booked)*100) : 0;
   const closeRate = totalCount ? Math.round((counts['Closed Won']/totalCount)*100) : 0;
@@ -1061,6 +1165,51 @@ function renderGHL(rows){
 }
 
 /* ---------- Meta Ads tab ---------- */
+/* Leads & Customers line chart -- independent of the main date filter
+   unless set to "Match Main Filter". Reuses filterByDate by temporarily
+   swapping currentRange (safe: synchronous, single-threaded). */
+function renderMetaLeadsChart(){
+  let rowsForChart;
+  if(metaChartRange === 'sync'){
+    rowsForChart = filterByDate(GHL_ROWS, 'Created At').filter(isMetaSourced);
+  } else if(metaChartRange === 'all'){
+    rowsForChart = GHL_ROWS.filter(isMetaSourced);
+  } else {
+    const saved = currentRange;
+    currentRange = metaChartRange;
+    rowsForChart = filterByDate(GHL_ROWS, 'Created At').filter(isMetaSourced);
+    currentRange = saved;
+  }
+
+  const byDay = {};
+  rowsForChart.forEach(r=>{
+    const d = r['Created At'] ? new Date(r['Created At']) : null;
+    if(!d || isNaN(d)) return;
+    const key = d.getFullYear()+'-'+String(d.getMonth()+1).padStart(2,'0')+'-'+String(d.getDate()).padStart(2,'0');
+    if(!byDay[key]) byDay[key] = {leads:0, customers:0};
+    byDay[key].leads++;
+    const stage = r['Normalized Stage'] || normalizeStage(r['Raw Stage']);
+    if(stage === 'Closed Won') byDay[key].customers++;
+  });
+
+  const sortedDays = Object.keys(byDay).sort();
+  const container = document.getElementById('meta-leads-chart');
+  if(sortedDays.length === 0){
+    container.innerHTML = '<div style="color:var(--light-muted);font-size:13.5px;padding:16px 4px;">No leads in this range.</div>';
+    return;
+  }
+  const dateLabels = sortedDays.map(k=>{ const [y,m,dd] = k.split('-'); return `${parseInt(m,10)}/${parseInt(dd,10)}`; });
+  const leadsSeries = sortedDays.map(k=>byDay[k].leads);
+  const customersSeries = sortedDays.map(k=>byDay[k].customers);
+
+  container.innerHTML =
+    svgLineChart([
+      {label:'Leads', color:'#244FC4', values:leadsSeries},
+      {label:'Customers', color:'#F5B91B', values:customersSeries}
+    ], dateLabels) +
+    chartLegend([{label:'Leads', color:'#244FC4'}, {label:'Customers', color:'#F5B91B'}]);
+}
+
 function renderMetaAds(rows, ghlRows){
   let totalSpend = 0;
   rows.forEach(r=>{
@@ -1125,7 +1274,19 @@ function renderMetaAds(rows, ghlRows){
   document.getElementById('meta-campaign-pageinfo').textContent =
     rows.length ? `Showing ${campaignPage.length} of ${sortedRows.length}` : '';
 
-  const sortedLeads = [...metaOpps].sort((a,b)=> new Date(b['Created At']) - new Date(a['Created At']));
+  // One row per CONTACT, not per opportunity -- a contact can have more than
+  // one opportunity (e.g. re-entering the funnel), which showed as duplicates.
+  // Keep whichever of that contact's opportunities was created most recently.
+  const byContact = {};
+  metaOpps.forEach(r=>{
+    const cid = r['Contact ID'] || r['Opportunity Name'];
+    const existing = byContact[cid];
+    if(!existing || new Date(r['Created At']) > new Date(existing['Created At'])){
+      byContact[cid] = r;
+    }
+  });
+  const dedupedLeads = Object.values(byContact);
+  const sortedLeads = dedupedLeads.sort((a,b)=> new Date(b['Created At']) - new Date(a['Created At']));
   const leadPage = sortedLeads.slice(0, metaLeadPageSize);
   const leadBody = document.getElementById('meta-lead-body');
   leadBody.innerHTML = '';
@@ -1134,13 +1295,14 @@ function renderMetaAds(rows, ghlRows){
   } else {
     leadPage.forEach(r=>{
       const stage = r['Normalized Stage'] || normalizeStage(r['Raw Stage']);
-      const val = parseFloat(r['Monetary Value'])||0;
       const created = r['Created At'] ? new Date(r['Created At']).toLocaleDateString() : '—';
-      leadBody.innerHTML += `<tr><td class="name-cell">${r['Opportunity Name']||r['Contact ID']||'—'}</td><td>${r.Rep||'—'}</td><td>${r.Status||'—'}</td><td>${stage}</td><td>${r['Funnel Classification']||'—'}</td><td>$${val.toLocaleString()}</td><td>${created}</td></tr>`;
+      leadBody.innerHTML += `<tr><td class="name-cell">${r['Opportunity Name']||r['Contact ID']||'—'}</td><td>${created}</td><td>${r.Rep||'—'}</td><td>${r.Status||'—'}</td><td>${stage}</td><td>${r['Funnel Classification']||'—'}</td><td>${r.Tags||'—'}</td></tr>`;
     });
   }
   document.getElementById('meta-lead-pageinfo').textContent =
     sortedLeads.length ? `Showing ${leadPage.length} of ${sortedLeads.length}` : '';
+
+  renderMetaLeadsChart();
 
   return { totalSpend, totalLeads, cpl, customers, cac };
 }

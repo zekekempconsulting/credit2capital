@@ -789,11 +789,17 @@ const CONFIG = {
   /* A GHL opportunity counts as Meta-sourced only if its Contact Source
      contains this text. Adjust here if the tag wording changes. */
   metaSourceTag: "meta ads",
-  /* ---- Profitability tab inputs (Zeke's numbers, confirmed 9/29/2026) ---- */
+  /* ---- Profitability tab inputs (Zeke's numbers, confirmed 9/29/2026) ----
+     paidOverheadSharePct is fixed at 5% by Zeke's call -- it does not move
+     with live data. valuePerClient is the flat $149 revenue attached to
+     every new client (GHL's own Monetary Value field isn't reliably
+     populated yet, so this is the real number to use until that's fixed). */
   profitability: {
     costToServe: 5,
     dailyOverhead: 170.35,
-    publisherCostMonthly: 1000
+    publisherCostMonthly: 1000,
+    paidOverheadSharePct: 0.05,
+    valuePerClient: 149
   }
 };
 function csvUrl(gid){
@@ -1742,18 +1748,14 @@ function renderProfitability(ghlRows, ghlSummary, metaSummary, skoolSummary){
   const adSpend = metaSummary.totalSpend || 0;
   const cpa = clients ? (adSpend / clients) : 0;
   const publisherCost = (cfg.publisherCostMonthly / 30) * days;
-  // Paid ads only carries its share of overhead, proportional to how much
-  // of the company's total clients (every channel) it actually produced --
-  // not the full daily overhead. A 5%-of-clients channel shouldn't be
-  // expected to cover 100% of the business's fixed costs; as its share of
-  // clients grows, its share of overhead grows with it.
-  const totalCompanyClients = ghlSummary.closedWonAll || 0;
-  const paidSharePct = totalCompanyClients ? (clients / totalCompanyClients) : 0;
+  // Paid ads carries a fixed 5% share of overhead -- set by Zeke, does not
+  // move with live data.
+  const paidSharePct = cfg.paidOverheadSharePct;
   const overhead = cfg.dailyOverhead * days * paidSharePct;
 
-  // Real revenue: GHL's own Monetary Value field on each Meta-sourced Closed
-  // Won opportunity, summed directly -- not a placeholder.
-  const totalRevenue = wonRows.reduce((sum,r)=> sum + (parseFloat(r['Monetary Value']) || 0), 0);
+  // Revenue: flat $149 attached to every new client (GHL's Monetary Value
+  // field isn't reliably populated yet).
+  const totalRevenue = clients * cfg.valuePerClient;
   const revenuePerClient = clients ? (totalRevenue / clients) : 0;
   const costToServeTotal = clients * cfg.costToServe;
   const marginBeforeMedia = totalRevenue - costToServeTotal;
@@ -1803,7 +1805,7 @@ function renderProfitability(ghlRows, ghlSummary, metaSummary, skoolSummary){
       const leadDate = r['Created At'] ? parseDateSafe(r['Created At']).toLocaleDateString() : '—';
       const wonDate = getWonDate(r);
       const wonDateLabel = wonDate ? wonDate.toLocaleDateString() : '—';
-      const rowRevenue = parseFloat(r['Monetary Value']) || 0;
+      const rowRevenue = cfg.valuePerClient;
       const rowNetProfit = rowRevenue - cfg.costToServe - cpa;
       body.innerHTML += `<tr>
         <td class="name-cell">${r['Opportunity Name'] || r['Contact ID'] || '—'}</td>

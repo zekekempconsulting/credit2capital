@@ -364,6 +364,53 @@
     font-family:'IBM Plex Mono',monospace;
   }
 
+  .kpi-grid.cols-4{ grid-template-columns:repeat(4,1fr); }
+
+  /* ---- hoverable info tooltip on metric headlines ---- */
+  .info-tip{
+    position:relative; display:inline-flex; align-items:center; justify-content:center;
+    width:15px; height:15px; border-radius:50%; margin-left:6px;
+    background:rgba(36,79,196,0.14); color:var(--royal-onlight);
+    font-family:'Inter',sans-serif; font-size:10.5px; font-weight:700; font-style:normal;
+    cursor:help; vertical-align:middle;
+  }
+  .info-tip::before{
+    content: attr(data-tip);
+    position:absolute; bottom:calc(100% + 9px); left:50%; transform:translate(-50%,4px);
+    width:230px; padding:11px 13px; border-radius:10px;
+    background:var(--light-ink); color:#fff; font-family:'Inter',sans-serif;
+    font-size:12.5px; font-weight:400; line-height:1.45; text-transform:none; letter-spacing:normal;
+    box-shadow:0 8px 24px rgba(16,26,61,0.25);
+    opacity:0; visibility:hidden; transition:all .15s ease; z-index:30; pointer-events:none;
+  }
+  .info-tip::after{
+    content:''; position:absolute; bottom:calc(100% + 3px); left:50%; transform:translateX(-50%);
+    border:6px solid transparent; border-top-color:var(--light-ink);
+    opacity:0; visibility:hidden; transition:all .15s ease; z-index:30;
+  }
+  .info-tip:hover::before, .info-tip:hover::after{ opacity:1; visibility:visible; }
+  .info-tip:hover::before{ transform:translate(-50%,0); }
+
+  /* ---- Profitability tab: waterfall calculator ---- */
+  .calc-wrap{
+    background:var(--light-card); border:1px solid var(--light-border); border-radius:18px;
+    padding:6px 0; box-shadow:0 2px 14px rgba(16,26,61,0.05); margin-bottom:32px;
+  }
+  .calc-section{ padding:18px 26px; border-bottom:1px solid var(--light-border); }
+  .calc-section:last-child{ border-bottom:none; }
+  .calc-section-title{
+    font-family:'Space Grotesk',sans-serif; font-size:14.5px; font-weight:700; color:var(--light-ink);
+    margin-bottom:12px; display:flex; align-items:center;
+  }
+  .calc-row{ display:flex; justify-content:space-between; align-items:center; padding:6px 0; font-size:14.5px; }
+  .calc-row .calc-label{ color:var(--light-muted); display:flex; align-items:center; }
+  .calc-row .calc-value{ font-family:'IBM Plex Mono',monospace; font-weight:600; color:var(--light-ink); }
+  .calc-row.calc-total{ border-top:1px dashed var(--light-border); margin-top:8px; padding-top:12px; }
+  .calc-row.calc-total .calc-label{ color:var(--light-ink); font-weight:700; }
+  .calc-row.calc-total .calc-value{ font-size:17px; }
+  .calc-row.calc-final .calc-value{ color:var(--gold-onlight); font-size:22px; font-weight:700; }
+  .calc-note{ font-size:12.5px; color:var(--light-muted); margin-top:8px; font-style:italic; line-height:1.5; }
+
   @media (max-width: 900px){
     .kpi-grid, .kpi-grid.cols-6, .kpi-grid.cols-7{ grid-template-columns:repeat(2,1fr); }
     .kpi-grid.cols-3{ grid-template-columns:1fr; }
@@ -435,6 +482,7 @@
       <button class="tab-btn" data-tab="metaads">Meta Ads</button>
       <button class="tab-btn" data-tab="ghl">GoHighLevel</button>
       <button class="tab-btn" data-tab="skool">Skool</button>
+      <button class="tab-btn" data-tab="profitability">Paid Ads P&amp;L</button>
     </div>
   </div>
 
@@ -446,6 +494,7 @@
       <button class="date-pill" data-range="30d">30 Days</button>
       <button class="date-pill" data-range="mtd">This Month</button>
       <button class="date-pill" data-range="ytd">Year to Date</button>
+      <button class="date-pill" data-range="qtd">This Quarter</button>
       <button class="date-pill" data-range="custom">Custom</button>
       <div class="date-custom-row hidden" id="date-custom-row">
         <input type="date" id="date-start">
@@ -587,7 +636,9 @@
         <div class="table-pagination">
           <span class="pagination-info" id="meta-lead-pageinfo"></span>
           <div class="pagination-controls" data-target="lead">
-            <button class="page-size-btn active" data-size="10">10</button>
+            <button class="page-size-btn active" data-size="5">5</button>
+            <button class="page-size-btn" data-size="10">10</button>
+            <button class="page-size-btn" data-size="25">25</button>
             <button class="page-size-btn" data-size="50">50</button>
             <button class="page-size-btn" data-size="100">100</button>
           </div>
@@ -653,6 +704,70 @@
       <div class="source-grid" id="skool-source-grid" style="grid-template-columns:repeat(2,1fr);"></div>
     </div>
 
+    <!-- ===== PROFITABILITY ===== -->
+    <div class="tab-panel" id="panel-profitability">
+      <div class="section-label">Paid Ads P&amp;L</div>
+      <div class="calc-note" style="margin:-6px 0 22px;">Scoped to Meta-sourced clients only (Contact Source contains "Meta Ads"). Uses real revenue recorded in GHL (Won Value per closed client) and real spend from Meta. Cost to Serve, Overhead, and Publisher Cost are the fixed business inputs Zeke confirmed on 9/29.</div>
+
+      <div class="kpi-grid cols-4" id="profit-kpi-grid">
+        <div class="kpi-card"><div class="kpi-value" id="profit-kpi-clients">&mdash;</div><div class="kpi-label">Total Clients</div></div>
+        <div class="kpi-card"><div class="kpi-value" id="profit-kpi-blendedcpa">&mdash;</div><div class="kpi-label">CPA</div></div>
+        <div class="kpi-card"><div class="kpi-value" id="profit-kpi-revenue">&mdash;</div><div class="kpi-label">Total Revenue</div></div>
+        <div class="kpi-card gold"><div class="kpi-value" id="profit-kpi-netprofit">&mdash;</div><div class="kpi-label">Net Profit</div></div>
+      </div>
+
+      <div class="calc-wrap" id="profit-calc-wrap">
+        <div class="calc-section">
+          <div class="calc-section-title">Volume<span class="info-tip" data-tip="How many clients came in during the selected date range.">i</span></div>
+          <div class="calc-row"><span class="calc-label">Total Clients</span><span class="calc-value" id="calc-volume">&mdash;</span></div>
+        </div>
+        <div class="calc-section">
+          <div class="calc-section-title">Revenue &amp; Cost<span class="info-tip" data-tip="What clients are worth, minus what it costs to serve them, before counting any marketing spend.">i</span></div>
+          <div class="calc-row"><span class="calc-label">Revenue per Client (avg)</span><span class="calc-value" id="calc-revperclient">&mdash;</span></div>
+          <div class="calc-row"><span class="calc-label">Total Revenue</span><span class="calc-value" id="calc-totalrevenue">&mdash;</span></div>
+          <div class="calc-row"><span class="calc-label">Cost to Serve per Client</span><span class="calc-value" id="calc-ctsperclient">&mdash;</span></div>
+          <div class="calc-row"><span class="calc-label">Total Cost to Serve</span><span class="calc-value" id="calc-totalcts">&mdash;</span></div>
+          <div class="calc-row calc-total"><span class="calc-label">Margin (Before Media)</span><span class="calc-value" id="calc-marginbefore">&mdash;</span></div>
+        </div>
+        <div class="calc-section">
+          <div class="calc-section-title">Media<span class="info-tip" data-tip="What was spent on Meta ads to generate leads and clients, plus what ZKC charges to run and manage the ads.">i</span></div>
+          <div class="calc-row"><span class="calc-label">Ad Spend (period)</span><span class="calc-value" id="calc-adspend">&mdash;</span></div>
+          <div class="calc-row"><span class="calc-label">Publisher Cost (period)</span><span class="calc-value" id="calc-publishercost">&mdash;</span></div>
+          <div class="calc-row calc-total"><span class="calc-label">Margin After Media &amp; Publisher</span><span class="calc-value" id="calc-marginafter">&mdash;</span></div>
+        </div>
+        <div class="calc-section">
+          <div class="calc-section-title">Overhead &amp; Bottom Line<span class="info-tip" data-tip="The day-to-day cost of running C2C's business, applied across the whole period, regardless of channel.">i</span></div>
+          <div class="calc-row"><span class="calc-label" id="calc-overhead-label">Business Overhead (period)</span><span class="calc-value" id="calc-overhead">&mdash;</span></div>
+          <div class="calc-row calc-total calc-final"><span class="calc-label">Profit After All Charges</span><span class="calc-value" id="calc-profitfinal">&mdash;</span></div>
+        </div>
+      </div>
+
+      <div class="section-label">Client-Level Profitability <span style="text-transform:none;letter-spacing:0;color:var(--light-muted);font-weight:400;">&mdash; one row per client, most recent first</span></div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr>
+              <th>Client</th><th>Lead Date</th><th>Won Date</th>
+              <th>CPA</th>
+              <th>Cost to Serve</th>
+              <th>Revenue</th>
+              <th>Net Profit</th>
+            </tr>
+          </thead>
+          <tbody id="profit-client-body"></tbody>
+        </table>
+        <div class="table-pagination">
+          <span class="pagination-info" id="profit-client-pageinfo"></span>
+          <div class="pagination-controls" data-target="profitclient">
+            <button class="page-size-btn active" data-size="5">5</button>
+            <button class="page-size-btn" data-size="10">10</button>
+            <button class="page-size-btn" data-size="25">25</button>
+            <button class="page-size-btn" data-size="50">50</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
     <div class="footer-note">Data synced automatically from Meta Ads, GoHighLevel &amp; Skool · Built by Zeke Kemp Consulting (ZKC)</div>
   </div>
 </div>
@@ -673,7 +788,13 @@ const CONFIG = {
   },
   /* A GHL opportunity counts as Meta-sourced only if its Contact Source
      contains this text. Adjust here if the tag wording changes. */
-  metaSourceTag: "meta ads"
+  metaSourceTag: "meta ads",
+  /* ---- Profitability tab inputs (Zeke's numbers, confirmed 9/29/2026) ---- */
+  profitability: {
+    costToServe: 5,
+    dailyOverhead: 170.35,
+    publisherCostMonthly: 1000
+  }
 };
 function csvUrl(gid){
   /* Cache-busting timestamp: without this, browsers will happily keep
@@ -959,7 +1080,7 @@ let GHL_ROWS = [], META_ROWS = [], SKOOL_ROWS = [];
 let CLARITY_OVERVIEW_ROWS = [], CLARITY_BREAKDOWN_ROWS = [];
 let metaChartRange = 'sync';
 let campaignChartRange = 'sync';
-let metaCampaignPageSize = 10, metaLeadPageSize = 10;
+let metaCampaignPageSize = 10, metaLeadPageSize = 5, profitClientPageSize = 5;
 let currentRange = 'all';
 
 /* ---------- Built-in CSV parser ---------- */
@@ -1045,6 +1166,7 @@ function getRangeBounds(range, customStart, customEnd){
     case '30d': return [new Date(now - 30*86400000), now];
     case 'mtd': return [new Date(now.getFullYear(), now.getMonth(), 1), now];
     case 'ytd': return [new Date(now.getFullYear(), 0, 1), now];
+    case 'qtd': return [new Date(now.getFullYear(), Math.floor(now.getMonth()/3)*3, 1), now];
     case 'custom': return [customStart, customEnd];
     default: return null;
   }
@@ -1096,6 +1218,7 @@ document.querySelectorAll('.pagination-controls').forEach(group=>{
       const size = parseInt(btn.dataset.size, 10);
       if(group.dataset.target === 'campaign') metaCampaignPageSize = size;
       if(group.dataset.target === 'lead') metaLeadPageSize = size;
+      if(group.dataset.target === 'profitclient') profitClientPageSize = size;
       applyFilterAndRenderAll();
     });
   });
@@ -1155,6 +1278,7 @@ function applyFilterAndRenderAll(){
   const skoolSummary = renderSkool(skoolRows);
   renderOverview(ghlRows, ghlSummary, metaSummary, skoolSummary);
   renderClarity(clarityOverviewRows, clarityBreakdownRows);
+  renderProfitability(ghlRows, ghlSummary, metaSummary, skoolSummary);
 }
 
 /* ---------- GHL tab ---------- */
@@ -1265,7 +1389,7 @@ function renderGHL(rows){
       </div>`;
   });
 
-  return { totalCount, wonRevenue, closeRate, booked, reps };
+  return { totalCount, wonRevenue, closeRate, booked, reps, closedWonAll: counts['Closed Won'] };
 }
 
 /* ---------- Meta Ads tab ---------- */
@@ -1576,6 +1700,124 @@ function renderSkool(rows){
     </div>`;
 
   return { members, mrr, newMrr, engagement: latest.Engagement || '—', retention: latest.Retention || '—' };
+}
+
+/* ---------- Profitability tab ---------- */
+/* How many days the current date-filter selection actually spans, used to
+   prorate the monthly Publisher Cost and the daily overhead figure. "All
+   Time" and "Custom" fall back to the real span of dates in the GHL sheet
+   (or 30 days if there isn't enough data yet) instead of an arbitrary number. */
+function computeDaysInRange(){
+  if(currentRange === 'all'){
+    const dates = GHL_ROWS.map(r=>parseDateSafe(r['Created At'])).filter(d=>!isNaN(d));
+    if(dates.length < 2) return 30;
+    const span = Math.round((Math.max(...dates) - Math.min(...dates)) / 86400000);
+    return Math.max(span, 1);
+  }
+  if(currentRange === 'custom'){
+    const s = document.getElementById('date-start').value;
+    const e = document.getElementById('date-end').value;
+    if(!s || !e) return 30;
+    return Math.max(Math.round((new Date(e) - new Date(s)) / 86400000) + 1, 1);
+  }
+  const bounds = getRangeBounds(currentRange);
+  if(!bounds) return 30;
+  return Math.max(Math.round((bounds[1] - bounds[0]) / 86400000) + 1, 1);
+}
+function money(n){
+  return '$' + (Math.round(n*100)/100).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+/* This tab is scoped to Meta-sourced clients only (Contact Source contains
+   "Meta Ads") -- it's measuring what paid ads actually produced, not the
+   whole business. Same isMetaSourced() filter the Meta Ads tab already uses. */
+function renderProfitability(ghlRows, ghlSummary, metaSummary, skoolSummary){
+  const cfg = CONFIG.profitability;
+  const days = computeDaysInRange();
+
+  const wonRows = ghlRows.filter(r=>
+    isMetaSourced(r) && (r['Normalized Stage'] || normalizeStage(r['Raw Stage'])) === 'Closed Won'
+  );
+  const clients = wonRows.length;
+
+  const adSpend = metaSummary.totalSpend || 0;
+  const cpa = clients ? (adSpend / clients) : 0;
+  const publisherCost = (cfg.publisherCostMonthly / 30) * days;
+  // Paid ads only carries its share of overhead, proportional to how much
+  // of the company's total clients (every channel) it actually produced --
+  // not the full daily overhead. A 5%-of-clients channel shouldn't be
+  // expected to cover 100% of the business's fixed costs; as its share of
+  // clients grows, its share of overhead grows with it.
+  const totalCompanyClients = ghlSummary.closedWonAll || 0;
+  const paidSharePct = totalCompanyClients ? (clients / totalCompanyClients) : 0;
+  const overhead = cfg.dailyOverhead * days * paidSharePct;
+
+  // Real revenue: GHL's own Monetary Value field on each Meta-sourced Closed
+  // Won opportunity, summed directly -- not a placeholder.
+  const totalRevenue = wonRows.reduce((sum,r)=> sum + (parseFloat(r['Monetary Value']) || 0), 0);
+  const revenuePerClient = clients ? (totalRevenue / clients) : 0;
+  const costToServeTotal = clients * cfg.costToServe;
+  const marginBeforeMedia = totalRevenue - costToServeTotal;
+  const marginAfterMedia = marginBeforeMedia - adSpend - publisherCost;
+  const profitFinal = marginAfterMedia - overhead;
+
+  document.getElementById('profit-kpi-clients').textContent = clients.toLocaleString();
+  document.getElementById('profit-kpi-blendedcpa').textContent = clients ? money(cpa) : '—';
+  document.getElementById('profit-kpi-revenue').textContent = money(totalRevenue);
+  document.getElementById('profit-kpi-netprofit').textContent = money(profitFinal);
+
+  document.getElementById('calc-volume').textContent = clients.toLocaleString() + ' clients';
+  document.getElementById('calc-revperclient').textContent = money(revenuePerClient);
+  document.getElementById('calc-totalrevenue').textContent = money(totalRevenue);
+  document.getElementById('calc-ctsperclient').textContent = money(cfg.costToServe);
+  document.getElementById('calc-totalcts').textContent = '-' + money(costToServeTotal);
+  document.getElementById('calc-marginbefore').textContent = money(marginBeforeMedia);
+  document.getElementById('calc-adspend').textContent = '-' + money(adSpend);
+  document.getElementById('calc-publishercost').textContent = '-' + money(publisherCost);
+  document.getElementById('calc-marginafter').textContent = money(marginAfterMedia);
+  document.getElementById('calc-overhead').textContent = '-' + money(overhead);
+  document.getElementById('calc-overhead-label').textContent =
+    'Business Overhead (' + Math.round(paidSharePct*100) + '% share of ' + money(cfg.dailyOverhead*days) + ')';
+  document.getElementById('calc-profitfinal').textContent = money(profitFinal);
+
+  // Won Date: the real date GHL recorded the stage change to Closed Won /
+  // Funnel Classification change to Client. Tries every plausible column
+  // name your sheet export might use for that; if none of these exist in
+  // the sheet yet, this shows a dash rather than faking it with Lead Date.
+  function getWonDate(r){
+    const raw = r['Closed Won Date'] || r['Closed Date'] || r['Won Date'] ||
+                r['Stage Changed Date'] || r['Funnel Classification Date'] ||
+                r['Updated At'] || '';
+    if(!raw) return null;
+    const d = parseDateSafe(raw);
+    return isNaN(d) ? null : d;
+  }
+
+  const sortedWon = [...wonRows].sort((a,b)=> parseDateSafe(b['Created At']) - parseDateSafe(a['Created At']));
+  const page = sortedWon.slice(0, profitClientPageSize);
+  const body = document.getElementById('profit-client-body');
+  body.innerHTML = '';
+  if(sortedWon.length === 0){
+    body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--light-muted);font-family:Inter,sans-serif;">No Meta-sourced clients closed in this date range.</td></tr>';
+  } else {
+    page.forEach(r=>{
+      const leadDate = r['Created At'] ? parseDateSafe(r['Created At']).toLocaleDateString() : '—';
+      const wonDate = getWonDate(r);
+      const wonDateLabel = wonDate ? wonDate.toLocaleDateString() : '—';
+      const rowRevenue = parseFloat(r['Monetary Value']) || 0;
+      const rowNetProfit = rowRevenue - cfg.costToServe - cpa;
+      body.innerHTML += `<tr>
+        <td class="name-cell">${r['Opportunity Name'] || r['Contact ID'] || '—'}</td>
+        <td>${leadDate}</td>
+        <td>${wonDateLabel}</td>
+        <td>${clients ? money(cpa) : '—'}</td>
+        <td>${money(cfg.costToServe)}</td>
+        <td>${money(rowRevenue)}</td>
+        <td>${money(rowNetProfit)}</td>
+      </tr>`;
+    });
+  }
+  document.getElementById('profit-client-pageinfo').textContent =
+    sortedWon.length ? `Showing ${page.length} of ${sortedWon.length}` : '';
 }
 
 /* ---------- Meta Ads tab: Clarity site-behavior section ---------- */

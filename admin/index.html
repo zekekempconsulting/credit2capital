@@ -969,6 +969,23 @@ function normalizeStage(raw){
 function isMetaSourced(row){
   return (row['Contact Source']||'').toLowerCase().includes(CONFIG.metaSourceTag);
 }
+/* Same person filling out the form more than once (e.g. re-submitting a
+   few days later) creates more than one opportunity row for the same
+   contact. Every count on this dashboard should count people, not rows,
+   so this keeps just the most recent row per contact and drops the rest.
+   The Meta Ads tab already did this for its own numbers -- this makes the
+   GHL tab and Paid Ads P&L do the same. */
+function dedupeContactsMostRecent(rows){
+  const byContact = {};
+  rows.forEach(r=>{
+    const cid = r['Contact ID'] || r['Opportunity ID'] || r['Opportunity Name'];
+    const existing = byContact[cid];
+    if(!existing || new Date(r['Created At']) > new Date(existing['Created At'])){
+      byContact[cid] = r;
+    }
+  });
+  return Object.values(byContact);
+}
 
 /* TEMPORARY: manual GHL edits for these two haven't synced to the sheet yet
    (cache + daily quota). This feeds BOTH the Lead Breakdown table display
@@ -1287,6 +1304,7 @@ function applyFilterAndRenderAll(){
 
 /* ---------- GHL tab ---------- */
 function renderGHL(rows){
+  rows = dedupeContactsMostRecent(rows);
   const stageOrder = ['Qualified Lead','Unqualified / Nurture','In Follow-Up','Meeting Booked','No Show','Rescheduled','Closed Won'];
   const counts = {}; stageOrder.forEach(s=>counts[s]=0);
   let wonRevenue = 0, totalCount = rows.length;
@@ -1707,15 +1725,18 @@ function renderSkool(rows){
 }
 
 /* ---------- Profitability tab ---------- */
+/* Ads launched 9/7/2026 -- fixed anchor, confirmed by Zeke. Nothing before
+   this date should ever count toward Paid Ads P&L, under any filter. */
+const ADS_START_DATE = new Date(2026, 8, 7);
+
 /* How many days the current date-filter selection actually spans, used to
    prorate the monthly Publisher Cost and the daily overhead figure. "All
-   Time" and "Custom" fall back to the real span of dates in the GHL sheet
-   (or 30 days if there isn't enough data yet) instead of an arbitrary number. */
+   Time" always runs from ADS_START_DATE through today -- not the earliest
+   GHL contact ever created, which can reach back before any ad ever ran
+   and wildly overstate the period. */
 function computeDaysInRange(){
   if(currentRange === 'all'){
-    const dates = GHL_ROWS.map(r=>parseDateSafe(r['Created At'])).filter(d=>!isNaN(d));
-    if(dates.length < 2) return 30;
-    const span = Math.round((Math.max(...dates) - Math.min(...dates)) / 86400000);
+    const span = Math.round((new Date() - ADS_START_DATE) / 86400000);
     return Math.max(span, 1);
   }
   if(currentRange === 'custom'){
@@ -1738,9 +1759,12 @@ function renderProfitability(ghlRows, ghlSummary, metaSummary, skoolSummary){
   const cfg = CONFIG.profitability;
   const days = computeDaysInRange();
 
-  const wonRows = ghlRows.filter(r=>
-    isMetaSourced(r) && (r['Normalized Stage'] || normalizeStage(r['Raw Stage'])) === 'Closed Won'
-  );
+  const wonRows = dedupeContactsMostRecent(ghlRows).filter(r=>{
+    if(!isMetaSourced(r)) return false;
+    if((r['Normalized Stage'] || normalizeStage(r['Raw Stage'])) !== 'Closed Won') return false;
+    const created = parseDateSafe(r['Created At']);
+    return !isNaN(created) && created >= ADS_START_DATE;
+  });
   const clients = wonRows.length;
 
   const adSpend = metaSummary.totalSpend || 0;
@@ -1851,8 +1875,30 @@ const CLARITY_FALLBACK_BREAKDOWNS = [
   {'Breakdown Type':'Campaign', Value:'23858991120080795', Sessions:3}
 ];
 
+/* Sessions and Distinct Users are per-day counts, so they SUM across the
+   selected date range. Pages Per Session, Scroll Depth, Active Time and the
+   session-quality rates are all percentages/averages, so they're averaged
+   across the days in range instead. Previously this only ever showed the
+   single most recent day's row, no matter what date filter was selected --
+   that's why "This Month" and "All Time" looked identical to "Today". */
+function aggregateClarityOverview(rows){
+  if(!rows.length) return CLARITY_FALLBACK_OVERVIEW;
+  const n = rows.length;
+  const sum = (key) => rows.reduce((s,r)=> s + (parseFloat(r[key])||0), 0);
+  return {
+    'Sessions': sum('Sessions'),
+    'Distinct Users': sum('Distinct Users'),
+    'Pages Per Session': sum('Pages Per Session') / n,
+    'Avg Scroll Depth %': sum('Avg Scroll Depth %') / n,
+    'Active Time (sec)': sum('Active Time (sec)') / n,
+    'Rage Click %': sum('Rage Click %') / n,
+    'Dead Click %': sum('Dead Click %') / n,
+    'Excessive Scroll %': sum('Excessive Scroll %') / n,
+    'Quickback %': sum('Quickback %') / n
+  };
+}
 function renderClarity(overviewRows, breakdownRows){
-  const latest = overviewRows.length ? overviewRows[overviewRows.length-1] : CLARITY_FALLBACK_OVERVIEW;
+  const latest = aggregateClarityOverview(overviewRows);
   const breakdowns = breakdownRows.length ? breakdownRows : CLARITY_FALLBACK_BREAKDOWNS;
 
   document.getElementById('clarity-kpi-sessions').textContent = latest['Sessions'] || '—';
@@ -1914,12 +1960,13 @@ function renderOverview(ghlRows, ghlSummary, metaSummary, skoolSummary){
   document.getElementById('ov-ghl-closerate').textContent = ghlSummary.closeRate + '%';
   document.getElementById('ov-ghl-revenue').textContent = '$' + ghlSummary.wonRevenue.toLocaleString();
 
-  const won = ghlRows.filter(r=>(r['Normalized Stage']||normalizeStage(r['Raw Stage']))==='Closed Won').length;
-  const dead = ghlRows.filter(r=>{
+  const dedupedGhlRows = dedupeContactsMostRecent(ghlRows);
+  const won = dedupedGhlRows.filter(r=>(r['Normalized Stage']||normalizeStage(r['Raw Stage']))==='Closed Won').length;
+  const dead = dedupedGhlRows.filter(r=>{
     const s = r['Normalized Stage']||normalizeStage(r['Raw Stage']);
     return s==='Unqualified / Nurture' || s==='No Show';
   }).length;
-  const active = Math.max(ghlRows.length - won - dead, 0);
+  const active = Math.max(dedupedGhlRows.length - won - dead, 0);
   const repEntries = Object.keys(ghlSummary.reps||{}).map(name=>{
     const d = ghlSummary.reps[name];
     const cr = d.total ? Math.round((d.closed/d.total)*100) : 0;

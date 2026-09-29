@@ -1730,24 +1730,34 @@ function renderSkool(rows){
 const ADS_START_DATE = new Date(2026, 8, 7);
 
 /* How many days the current date-filter selection actually spans, used to
-   prorate the monthly Publisher Cost and the daily overhead figure. "All
-   Time" always runs from ADS_START_DATE through today -- not the earliest
-   GHL contact ever created, which can reach back before any ad ever ran
-   and wildly overstate the period. */
+   prorate the monthly Publisher Cost and the daily overhead figure. The
+   start of EVERY filter -- not just "All Time" -- is clamped to
+   ADS_START_DATE, so "This Month" can't quietly charge overhead for the
+   days before Sept 1-6 when no ad had run yet. That mismatch was exactly
+   why "All Time" and "This Month" showed two different profit numbers
+   even though all the real activity happened after 9/7. */
 function computeDaysInRange(){
+  const now = new Date();
+  let start, end;
+
   if(currentRange === 'all'){
-    const span = Math.round((new Date() - ADS_START_DATE) / 86400000);
-    return Math.max(span, 1);
-  }
-  if(currentRange === 'custom'){
+    start = ADS_START_DATE; end = now;
+  } else if(currentRange === 'custom'){
     const s = document.getElementById('date-start').value;
     const e = document.getElementById('date-end').value;
-    if(!s || !e) return 30;
-    return Math.max(Math.round((new Date(e) - new Date(s)) / 86400000) + 1, 1);
+    if(!s || !e){ start = ADS_START_DATE; end = now; }
+    else { start = new Date(s); end = new Date(e); }
+  } else {
+    const bounds = getRangeBounds(currentRange);
+    if(!bounds){ start = ADS_START_DATE; end = now; }
+    else { [start, end] = bounds; }
   }
-  const bounds = getRangeBounds(currentRange);
-  if(!bounds) return 30;
-  return Math.max(Math.round((bounds[1] - bounds[0]) / 86400000) + 1, 1);
+
+  if(start < ADS_START_DATE) start = ADS_START_DATE;
+  if(end > now) end = now;
+
+  const span = Math.round((end - start) / 86400000) + 1;
+  return Math.max(span, 1);
 }
 function money(n){
   return '$' + (Math.round(n*100)/100).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});

@@ -364,6 +364,31 @@
     font-family:'IBM Plex Mono',monospace;
   }
 
+  /* ---- Dashboard view counter (hidden, Zeke-only via the "ZKC" footer
+     credit, only active while on the Paid Media Profitability tab) ---- */
+  .view-log-overlay{
+    display:none; position:fixed; inset:0; background:rgba(16,26,61,0.4);
+    z-index:9999; align-items:center; justify-content:center;
+  }
+  .view-log-overlay.open{ display:flex; }
+  .view-log-modal{
+    background:var(--light-card); border-radius:14px; padding:22px 26px;
+    max-width:90vw; font-family:'Inter',sans-serif; text-align:center;
+    box-shadow:0 20px 60px rgba(16,26,61,0.35);
+  }
+  .view-log-modal-header{
+    display:flex; align-items:center; justify-content:space-between; gap:18px;
+    font-weight:700; font-size:14px; color:var(--light-ink); margin-bottom:12px;
+  }
+  .view-log-close{
+    background:none; border:none; font-size:18px; line-height:1; cursor:pointer;
+    color:var(--light-muted);
+  }
+  .view-log-count{
+    font-size:36px; font-weight:800; color:var(--royal); font-family:'IBM Plex Mono',monospace;
+  }
+  .view-log-sub{ font-size:12px; color:var(--light-muted); margin-top:4px; }
+
   .kpi-grid.cols-4{ grid-template-columns:repeat(4,1fr); }
 
   /* ---- hoverable info tooltip on metric headlines ---- */
@@ -479,10 +504,10 @@
     </div>
     <div class="tab-bar" id="tab-bar">
       <button class="tab-btn active" data-tab="overview">Overview</button>
-      <button class="tab-btn" data-tab="metaads">Meta Ads</button>
       <button class="tab-btn" data-tab="ghl">GoHighLevel</button>
       <button class="tab-btn" data-tab="skool">Skool</button>
-      <button class="tab-btn" data-tab="profitability">Paid Ads P&amp;L</button>
+      <button class="tab-btn" data-tab="metaads">Meta Ads</button>
+      <button class="tab-btn" data-tab="profitability">Paid Media Profitability</button>
     </div>
   </div>
 
@@ -553,6 +578,53 @@
             <div class="kpi-card"><div class="kpi-value" id="ov-skool-engagement">—</div><div class="kpi-label">Engagement</div></div>
           </div>
           <div class="source-grid" id="ov-skool-charts" style="grid-template-columns:1fr 1fr;"></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ===== GHL ===== -->
+    <div class="tab-panel" id="panel-ghl">
+      <div class="section-label">GoHighLevel Pipeline</div>
+      <div class="error-banner" id="ghl-error-banner" style="display:none;">Live data unavailable — check your connection or the sheet's sharing settings.</div>
+      <div class="kpi-grid" id="kpi-grid">
+        <div class="kpi-card"><div class="kpi-value" id="kpi-total">—</div><div class="kpi-label">Total Opportunities</div></div>
+        <div class="kpi-card"><div class="kpi-value" id="kpi-booked">—</div><div class="kpi-label">Meetings Booked</div></div>
+        <div class="kpi-card"><div class="kpi-value" id="kpi-showrate">—</div><div class="kpi-label">Show Rate</div></div>
+        <div class="kpi-card"><div class="kpi-value" id="kpi-closerate">—</div><div class="kpi-label">Close Rate</div></div>
+        <div class="kpi-card gold"><div class="kpi-value" id="kpi-revenue">—</div><div class="kpi-label">Won Revenue</div></div>
+      </div>
+
+      <div class="source-grid" id="ghl-charts" style="margin-bottom:44px;"></div>
+
+      <div class="funnel-section">
+        <div class="section-label">Pipeline by Stage — Largest to Smallest</div>
+        <div class="funnel-row" id="funnel-row"></div>
+      </div>
+
+      <div class="rep-section">
+        <div class="section-label">Rep Performance</div>
+        <div class="rep-grid" id="rep-grid"></div>
+      </div>
+    </div>
+
+    <!-- ===== SKOOL ===== -->
+    <div class="tab-panel" id="panel-skool">
+      <div class="section-label">Skool Community</div>
+      <div class="error-banner" id="skool-error-banner" style="display:none;">Live data unavailable — check your connection or the sheet's sharing settings.</div>
+      <div class="kpi-grid" id="skool-kpi-grid">
+        <div class="kpi-card"><div class="kpi-value" id="skool-kpi-members">—</div><div class="kpi-label">Members</div></div>
+        <div class="kpi-card gold"><div class="kpi-value" id="skool-kpi-mrr">—</div><div class="kpi-label">MRR</div></div>
+        <div class="kpi-card gold"><div class="kpi-value" id="skool-kpi-newmrr">—</div><div class="kpi-label">New MRR</div></div>
+        <div class="kpi-card"><div class="kpi-value" id="skool-kpi-engagement">—</div><div class="kpi-label">Engagement</div></div>
+        <div class="kpi-card"><div class="kpi-value" id="skool-kpi-retention">—</div><div class="kpi-label">Retention</div></div>
+      </div>
+      <div class="source-grid" id="skool-gauge-grid" style="grid-template-columns:repeat(2,1fr);"></div>
+      <div class="section-label">Signup &amp; Traffic Sources</div>
+      <div class="source-grid" id="skool-source-grid" style="grid-template-columns:repeat(2,1fr);"></div>
+      <div class="section-label">Signups Over Time</div>
+      <div class="data-table-wrap" style="padding:20px 22px;">
+        <div style="position:relative;height:260px;">
+          <canvas id="skool-signups-chart-canvas"></canvas>
         </div>
       </div>
     </div>
@@ -663,50 +735,9 @@
       <div class="source-grid" id="clarity-charts" style="grid-template-columns:repeat(3,1fr);margin-bottom:32px;"></div>
     </div>
 
-    <!-- ===== GHL ===== -->
-    <div class="tab-panel" id="panel-ghl">
-      <div class="section-label">GoHighLevel Pipeline</div>
-      <div class="error-banner" id="ghl-error-banner" style="display:none;">Live data unavailable — check your connection or the sheet's sharing settings.</div>
-      <div class="kpi-grid" id="kpi-grid">
-        <div class="kpi-card"><div class="kpi-value" id="kpi-total">—</div><div class="kpi-label">Total Opportunities</div></div>
-        <div class="kpi-card"><div class="kpi-value" id="kpi-booked">—</div><div class="kpi-label">Meetings Booked</div></div>
-        <div class="kpi-card"><div class="kpi-value" id="kpi-showrate">—</div><div class="kpi-label">Show Rate</div></div>
-        <div class="kpi-card"><div class="kpi-value" id="kpi-closerate">—</div><div class="kpi-label">Close Rate</div></div>
-        <div class="kpi-card gold"><div class="kpi-value" id="kpi-revenue">—</div><div class="kpi-label">Won Revenue</div></div>
-      </div>
-
-      <div class="source-grid" id="ghl-charts" style="margin-bottom:44px;"></div>
-
-      <div class="funnel-section">
-        <div class="section-label">Pipeline by Stage — Largest to Smallest</div>
-        <div class="funnel-row" id="funnel-row"></div>
-      </div>
-
-      <div class="rep-section">
-        <div class="section-label">Rep Performance</div>
-        <div class="rep-grid" id="rep-grid"></div>
-      </div>
-    </div>
-
-    <!-- ===== SKOOL ===== -->
-    <div class="tab-panel" id="panel-skool">
-      <div class="section-label">Skool Community</div>
-      <div class="error-banner" id="skool-error-banner" style="display:none;">Live data unavailable — check your connection or the sheet's sharing settings.</div>
-      <div class="kpi-grid" id="skool-kpi-grid">
-        <div class="kpi-card"><div class="kpi-value" id="skool-kpi-members">—</div><div class="kpi-label">Members</div></div>
-        <div class="kpi-card gold"><div class="kpi-value" id="skool-kpi-mrr">—</div><div class="kpi-label">MRR</div></div>
-        <div class="kpi-card gold"><div class="kpi-value" id="skool-kpi-newmrr">—</div><div class="kpi-label">New MRR</div></div>
-        <div class="kpi-card"><div class="kpi-value" id="skool-kpi-engagement">—</div><div class="kpi-label">Engagement</div></div>
-        <div class="kpi-card"><div class="kpi-value" id="skool-kpi-retention">—</div><div class="kpi-label">Retention</div></div>
-      </div>
-      <div class="source-grid" id="skool-gauge-grid" style="grid-template-columns:repeat(2,1fr);"></div>
-      <div class="section-label">Signup &amp; Traffic Sources</div>
-      <div class="source-grid" id="skool-source-grid" style="grid-template-columns:repeat(2,1fr);"></div>
-    </div>
-
     <!-- ===== PROFITABILITY ===== -->
     <div class="tab-panel" id="panel-profitability">
-      <div class="section-label">Paid Ads P&amp;L</div>
+      <div class="section-label">Paid Media Profitability</div>
       <div class="kpi-grid cols-4" id="profit-kpi-grid">
         <div class="kpi-card"><div class="kpi-value" id="profit-kpi-clients">&mdash;</div><div class="kpi-label">Total Clients</div></div>
         <div class="kpi-card"><div class="kpi-value" id="profit-kpi-blendedcpa">&mdash;</div><div class="kpi-label">CPA</div></div>
@@ -748,7 +779,9 @@
               <th>Client</th><th>Lead Date</th><th>Won Date</th>
               <th>CPA</th>
               <th>Cost to Serve</th>
-              <th>Revenue</th>
+              <th>Membership Revenue</th>
+              <th>Funding Revenue</th>
+              <th>Total Revenue</th>
               <th>Net Profit</th>
             </tr>
           </thead>
@@ -766,9 +799,20 @@
       </div>
     </div>
 
-    <div class="footer-note">Data synced automatically from Meta Ads, GoHighLevel &amp; Skool · Built by Zeke Kemp Consulting (ZKC)</div>
+    <div class="footer-note">Data synced automatically from Meta Ads, GoHighLevel &amp; Skool · Built by Zeke Kemp Consulting (<span id="zkc-trigger" style="cursor:default;">ZKC</span>)</div>
   </div>
 </div>
+
+<div class="view-log-overlay" id="view-log-overlay">
+  <div class="view-log-modal">
+    <div class="view-log-modal-header">
+      <span>Dashboard Opens</span>
+      <button class="view-log-close" id="view-log-close">&times;</button>
+    </div>
+    <div class="view-log-count" id="view-log-count">&mdash;</div>
+    <div class="view-log-sub">total times the dashboard has been opened</div>
+  </div>
+</div></div>
 
 <script>
 /* ============================================================
@@ -826,6 +870,7 @@ const pwError = document.getElementById('pw-error');
 function attemptLogin(){
   if(pwInput.value === CONFIG.password){
     localStorage.setItem('c2c_saved_password', pwInput.value);
+    pingDashboardView();
     pwScreen.classList.add('hidden');
     startLoading();
   } else {
@@ -1288,6 +1333,55 @@ function switchTab(tab){
   document.querySelectorAll('.tab-panel').forEach(p=>p.classList.toggle('active', p.id === 'panel-'+tab));
 }
 
+/* ---------- Dashboard view counter ----------
+   Hidden feature: click the "ZKC" credit in the footer while on the Paid
+   Media Profitability tab to see a running total of how many times the
+   dashboard has been opened (password entries). Everywhere else "ZKC" is
+   inert plain text -- nothing to notice or click.
+
+   Zero setup required: uses a free, no-signup public counter API
+   (abacus.jasoncameron.dev) instead of any of Zeke's own infrastructure.
+   Tradeoff for that simplicity: just a running total, no dates/times/
+   per-day breakdown -- if that level of detail is wanted later, it needs
+   a real logging endpoint (the Apps Script Web App route discussed and
+   set aside for now). If this free public service ever goes down, the
+   counter just silently stops updating -- nothing else on the dashboard
+   is affected either way. */
+const VIEW_COUNTER_NAMESPACE = 'c2c-dashboard-zkc';
+const VIEW_COUNTER_KEY = 'opens';
+
+function pingDashboardView(){
+  fetch(`https://abacus.jasoncameron.dev/hit/${VIEW_COUNTER_NAMESPACE}/${VIEW_COUNTER_KEY}`, { mode: 'cors' }).catch(()=>{});
+}
+
+const zkcTrigger = document.getElementById('zkc-trigger');
+if(zkcTrigger){
+  zkcTrigger.addEventListener('click', ()=>{
+    const profitBtn = document.querySelector('.tab-btn[data-tab="profitability"]');
+    if(!profitBtn || !profitBtn.classList.contains('active')) return; // inert on every other tab
+    openViewCounterPanel();
+  });
+}
+
+const viewLogOverlay = document.getElementById('view-log-overlay');
+const viewLogClose = document.getElementById('view-log-close');
+if(viewLogClose){
+  viewLogClose.addEventListener('click', ()=> viewLogOverlay.classList.remove('open'));
+}
+if(viewLogOverlay){
+  viewLogOverlay.addEventListener('click', e=>{ if(e.target === viewLogOverlay) viewLogOverlay.classList.remove('open'); });
+}
+
+function openViewCounterPanel(){
+  viewLogOverlay.classList.add('open');
+  const countEl = document.getElementById('view-log-count');
+  countEl.textContent = '\u2026';
+  fetch(`https://abacus.jasoncameron.dev/get/${VIEW_COUNTER_NAMESPACE}/${VIEW_COUNTER_KEY}`, { mode: 'cors' })
+    .then(res => { if(!res.ok) throw new Error('fetch failed'); return res.json(); })
+    .then(data => { countEl.textContent = (data && typeof data.value === 'number') ? data.value.toLocaleString() : '\u2014'; })
+    .catch(()=>{ countEl.textContent = '\u2014'; });
+}
+
 function applyFilterAndRenderAll(){
   const ghlRows = filterByDate(GHL_ROWS, 'Created At');
   const metaRows = filterByDate(META_ROWS, 'Date');
@@ -1650,7 +1744,7 @@ function renderMetaAds(rows, ghlRows){
       const stage = r['Normalized Stage'] || normalizeStage(r['Raw Stage']);
       const created = r['Created At'] ? new Date(r['Created At']).toLocaleDateString() : '—';
       const funnelDisplay = getEffectiveFunnelClassification(r) || '—';
-      leadBody.innerHTML += `<tr><td class="name-cell">${r['Opportunity Name']||r['Contact ID']||'—'}</td><td>${created}</td><td>${r.Rep||'—'}</td><td>${r.Status||'—'}</td><td>${stage}</td><td>${funnelDisplay}</td><td>${r.Tags||'—'}</td><td>$${(parseFloat(r['Monetary Value'])||0).toLocaleString()}</td></tr>`;
+      leadBody.innerHTML += `<tr><td class="name-cell">${toTitleCase(r['Opportunity Name'])||r['Contact ID']||'—'}</td><td>${created}</td><td>${r.Rep||'—'}</td><td>${r.Status||'—'}</td><td>${stage}</td><td>${funnelDisplay}</td><td>${r.Tags||'—'}</td><td>$${(parseFloat(r['Monetary Value'])||0).toLocaleString()}</td></tr>`;
     });
   }
   document.getElementById('meta-lead-pageinfo').textContent =
@@ -1716,12 +1810,49 @@ function renderSkool(rows){
         ${svgBarList([
           {label:'Direct', value: parseFloat(latest.Direct)||0, color:'var(--royal-onlight)'},
           {label:'Email Invite', value: parseFloat(latest['Email Invite'])||0, color:'var(--gold-onlight)'},
+          {label:'Gmail', value: parseFloat(latest.Gmail)||0, color:'#E05D44'},
           {label:'Skool Network', value: parseFloat(latest['Skool Network'])||0, color:'var(--blue-tint)'}
         ])}
       </div>
     </div>`;
 
+  renderSkoolSignupsChart(rows);
+
   return { members, mrr, newMrr, engagement: latest.Engagement || '—', retention: latest.Retention || '—' };
+}
+
+let skoolSignupsChartInstance = null;
+/* Plots every row the Skool sheet has ever had, not just the latest one --
+   this is what actually makes it a trend instead of a single data point.
+   Keeps growing automatically every time a new dated row gets added. */
+function renderSkoolSignupsChart(rows){
+  const sorted = rows.slice().sort((a,b)=> new Date(a.Date) - new Date(b.Date));
+  const dateLabels = sorted.map(r=>{
+    const d = parseDateSafe(r.Date);
+    return isNaN(d) ? (r.Date||'') : d.toLocaleDateString(undefined,{month:'numeric',day:'numeric'});
+  });
+  const signupsSeries = sorted.map(r=> parseFloat(r.Signups)||0);
+
+  const canvas = document.getElementById('skool-signups-chart-canvas');
+  if(!canvas) return;
+  if(skoolSignupsChartInstance){ skoolSignupsChartInstance.destroy(); }
+  skoolSignupsChartInstance = new Chart(canvas.getContext('2d'), {
+    type: 'line',
+    data: {
+      labels: dateLabels,
+      datasets: [{
+        label: 'Signups', data: signupsSeries, borderColor: '#244FC4',
+        backgroundColor: '#244FC4', pointRadius: 4, pointHoverRadius: 6,
+        borderWidth: 2.5, tension: 0.25
+      }]
+    },
+    options: {
+      responsive: true,
+      maintainAspectRatio: false,
+      plugins: { legend: { display: false }, datalabels: { display: false } },
+      scales: { y: { beginAtZero: true, ticks: { precision: 0 } } }
+    }
+  });
 }
 
 /* ---------- Profitability tab ---------- */
@@ -1736,7 +1867,7 @@ const ADS_START_DATE = new Date(2026, 8, 7);
    days before Sept 1-6 when no ad had run yet. That mismatch was exactly
    why "All Time" and "This Month" showed two different profit numbers
    even though all the real activity happened after 9/7. */
-function computeDaysInRange(){
+function resolveDateRangeBounds(){
   const now = new Date();
   let start, end;
 
@@ -1755,12 +1886,31 @@ function computeDaysInRange(){
 
   if(start < ADS_START_DATE) start = ADS_START_DATE;
   if(end > now) end = now;
-
+  return { start, end };
+}
+function computeDaysInRange(){
+  const { start, end } = resolveDateRangeBounds();
   const span = Math.round((end - start) / 86400000) + 1;
   return Math.max(span, 1);
 }
+/* Publisher cost is a flat $1,000 PER CALENDAR MONTH, not prorated by days
+   elapsed -- Zeke's call (9/1000 for September regardless of how many days
+   ran, another flat $1,000 for October, etc). Counts distinct calendar
+   months touched by the selected range, floored at ADS_START_DATE. */
+function computeMonthsInRange(){
+  const { start, end } = resolveDateRangeBounds();
+  const startKey = start.getFullYear() * 12 + start.getMonth();
+  const endKey = end.getFullYear() * 12 + end.getMonth();
+  return Math.max(endKey - startKey + 1, 1);
+}
 function money(n){
   return '$' + (Math.round(n*100)/100).toLocaleString(undefined,{minimumFractionDigits:2,maximumFractionDigits:2});
+}
+/* Auto-corrects display-only: "mario felton" -> "Mario Felton". Doesn't
+   touch the underlying data, just how names render on the dashboard. */
+function toTitleCase(str){
+  if(!str) return str;
+  return String(str).replace(/\w\S*/g, w => w.charAt(0).toUpperCase() + w.slice(1).toLowerCase());
 }
 /* This tab is scoped to Meta-sourced clients only (Contact Source contains
    "Meta Ads") -- it's measuring what paid ads actually produced, not the
@@ -1779,7 +1929,8 @@ function renderProfitability(ghlRows, ghlSummary, metaSummary, skoolSummary){
 
   const adSpend = metaSummary.totalSpend || 0;
   const cpa = clients ? (adSpend / clients) : 0;
-  const publisherCost = (cfg.publisherCostMonthly / 30) * days;
+  const monthsInRange = computeMonthsInRange();
+  const publisherCost = cfg.publisherCostMonthly * monthsInRange;
   // Paid ads carries a fixed 5% share of overhead -- set by Zeke, does not
   // move with live data.
   const paidSharePct = cfg.paidOverheadSharePct;
@@ -1831,21 +1982,28 @@ function renderProfitability(ghlRows, ghlSummary, metaSummary, skoolSummary){
   const body = document.getElementById('profit-client-body');
   body.innerHTML = '';
   if(sortedWon.length === 0){
-    body.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--light-muted);font-family:Inter,sans-serif;">No Meta-sourced clients closed in this date range.</td></tr>';
+    body.innerHTML = '<tr><td colspan="9" style="text-align:center;color:var(--light-muted);font-family:Inter,sans-serif;">No Meta-sourced clients closed in this date range.</td></tr>';
   } else {
     page.forEach(r=>{
       const leadDate = r['Created At'] ? parseDateSafe(r['Created At']).toLocaleDateString() : '—';
       const wonDate = getWonDate(r);
       const wonDateLabel = wonDate ? wonDate.toLocaleDateString() : '—';
-      const rowRevenue = cfg.valuePerClient;
-      const rowNetProfit = rowRevenue - cfg.costToServe - cpa;
+      // Membership Revenue: flat $149 entry fee, assigned the day they close.
+      // Funding Revenue: blank/$0 placeholder until real funded-amount data
+      // is wired in (Zeke's call, 10/1/2026) -- not guessed at.
+      const rowMembershipRevenue = cfg.valuePerClient;
+      const rowFundingRevenue = 0;
+      const rowTotalRevenue = rowMembershipRevenue + rowFundingRevenue;
+      const rowNetProfit = rowTotalRevenue - cfg.costToServe - cpa;
       body.innerHTML += `<tr>
-        <td class="name-cell">${r['Opportunity Name'] || r['Contact ID'] || '—'}</td>
+        <td class="name-cell">${toTitleCase(r['Opportunity Name']) || r['Contact ID'] || '—'}</td>
         <td>${leadDate}</td>
         <td>${wonDateLabel}</td>
         <td>${clients ? money(cpa) : '—'}</td>
         <td>${money(cfg.costToServe)}</td>
-        <td>${money(rowRevenue)}</td>
+        <td>${money(rowMembershipRevenue)}</td>
+        <td>${rowFundingRevenue ? money(rowFundingRevenue) : '—'}</td>
+        <td>${money(rowTotalRevenue)}</td>
         <td>${money(rowNetProfit)}</td>
       </tr>`;
     });

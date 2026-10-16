@@ -697,6 +697,25 @@
           </div>
         </div>
       </div>
+      <div class="section-label">Lead Stage Breakdown <span style="text-transform:none;letter-spacing:0;color:var(--light-muted);font-weight:400;">&mdash; where every Meta lead is in the pipeline right now</span></div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Stage</th><th>GHL stages included</th><th>Leads</th><th>% of leads</th><th>Avg days in stage (leads here now)</th><th>Avg days before moving on</th></tr>
+          </thead>
+          <tbody id="meta-stage-body"></tbody>
+        </table>
+      </div>
+      <div class="funnel-definitions" id="meta-close-time" style="margin-top:12px;"></div>
+      <div class="section-label" style="margin-top:34px;">Leads By Week <span style="text-transform:none;letter-spacing:0;color:var(--light-muted);font-weight:400;">&mdash; Sunday to Saturday, grouped by the week the lead came in, showing where they are now</span></div>
+      <div class="data-table-wrap">
+        <table class="data-table">
+          <thead>
+            <tr><th>Week</th><th>Leads</th><th>Warm</th><th>Cold</th><th>In follow-up</th><th>Appointment process</th><th>Closed won</th><th>Other</th><th>Still working</th></tr>
+          </thead>
+          <tbody id="meta-stage-week-body"></tbody>
+        </table>
+      </div>
       <div class="section-label">Lead Breakdown <span style="text-transform:none;letter-spacing:0;color:var(--light-muted);font-weight:400;">— Contact Source contains "Meta Ads", one row per contact</span></div>
       <div class="data-table-wrap">
         <table class="data-table">
@@ -1533,12 +1552,13 @@ function renderCampaignTotal(){
   const byCampaign = {};
   rowsForTotal.forEach(r=>{
     const name = r['Campaign Name'] || 'Unknown';
-    if(!byCampaign[name]) byCampaign[name] = {spend:0, impressions:0, clicks:0, reach:0, leads:0};
+    if(!byCampaign[name]) byCampaign[name] = {spend:0, impressions:0, clicks:0, reach:0, leads:0, days:0};
     byCampaign[name].spend += parseFloat(r.Spend)||0;
     byCampaign[name].impressions += parseFloat(r.Impressions)||0;
     byCampaign[name].clicks += parseFloat(r.Clicks)||0;
     byCampaign[name].reach += parseFloat(r.Reach)||0;
     byCampaign[name].leads += parseFloat(r.Leads)||0;
+    byCampaign[name].days += 1;
   });
 
   const tbody = document.getElementById('campaign-total-body');
@@ -1559,7 +1579,7 @@ function renderCampaignTotal(){
       <td>${d.clicks.toLocaleString()}</td>
       <td>${ctr.toFixed(2)}%</td>
       <td>$${cpc.toFixed(2)}</td>
-      <td>${d.reach.toLocaleString()}</td>
+      <td title="Average people reached per day. Reach can't be added across days (the same person would be counted again), so this shows the daily average. See the daily rows for each day.">≈ ${d.days ? Math.round(d.reach/d.days).toLocaleString() : 0} / day</td>
       <td>${d.leads.toLocaleString()}</td>
     </tr>`;
   }).join('');
@@ -1752,8 +1772,132 @@ function renderMetaAds(rows, ghlRows){
 
   renderMetaLeadsChart();
   renderCampaignTotal();
+  renderMetaStageBreakdown(uniqueMetaLeads);
 
   return { totalSpend, totalLeads, cpl, customers, cac };
+}
+
+
+/* ---------- Lead Stage Breakdown (Meta Ads tab) ---------- */
+/* Groups GHL pipeline stages into the buckets Zeke tracks. Edit here if the
+   pipeline stages change. "Still working" = Warm + In follow-up + Appointment
+   process (leads that are neither closed nor cold). */
+const STAGE_GROUPS = [
+  { key:'warm',     label:'Warm',                stages:['Qualified Lead'],                              note:'Hot lead' },
+  { key:'cold',     label:'Cold',                stages:['Unqualified / Nurture'],                       note:'Cold lead / nurture' },
+  { key:'followup', label:'In follow-up',        stages:['In Follow-Up'],                                note:'Follow up' },
+  { key:'appt',     label:'Appointment process', stages:['Meeting Booked','Rescheduled','No Show'],      note:'Meeting booked, rescheduled, no show' },
+  { key:'won',      label:'Closed won',          stages:['Closed Won'],                                  note:'Closed' }
+];
+function stageGroupKey(stage){
+  for(const g of STAGE_GROUPS){ if(g.stages.includes(stage)) return g.key; }
+  return 'other';
+}
+function leadStage(r){ return r['Normalized Stage'] || normalizeStage(r['Raw Stage']); }
+function weekStartSunday(d){
+  const x = new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  x.setDate(x.getDate() - x.getDay());
+  return x;
+}
+/* Stage Path (written by the GHL sync) looks like "Hot lead stage|2026-10-01T10:00:00Z;Meeting Booked|2026-10-03T..".
+   Each entry is a stage and the time the lead entered it (blank = unknown). */
+function parseStagePath(r){
+  const raw = (r['Stage Path']||'').trim();
+  if(!raw) return [];
+  return raw.split(';').map(part=>{
+    const i = part.lastIndexOf('|');
+    const stage = i >= 0 ? part.slice(0,i) : part;
+    const at = i >= 0 ? part.slice(i+1) : '';
+    const d = at ? new Date(at) : null;
+    return { stage, at: (d && !isNaN(d)) ? d : null };
+  });
+}
+function enteredCurrentStageAt(r){
+  const raw = r['Stage Entered At'] || r['Last Stage Change At'] || '';
+  const d = raw ? new Date(raw) : null;
+  return (d && !isNaN(d)) ? d : null;
+}
+const DAY_MS = 86400000;
+function fmtDays(list){
+  if(!list.length) return '<span style="color:var(--light-muted);">Collecting data</span>';
+  const avg = list.reduce((a,b)=>a+b,0)/list.length;
+  return avg.toFixed(1) + ' days <span style="color:var(--light-muted);">(' + list.length + ')</span>';
+}
+function renderMetaStageBreakdown(uniqueMetaLeads){
+  const now = new Date();
+  /* Part 1: counts by stage group, for whatever the main date filter shows. */
+  const body = document.getElementById('meta-stage-body');
+  if(body){
+    const counts = {}, hereNow = {}, moved = {};
+    STAGE_GROUPS.forEach(g=>{ counts[g.key]=0; hereNow[g.key]=[]; moved[g.key]=[]; });
+    counts.other = 0; hereNow.other = []; moved.other = [];
+
+    uniqueMetaLeads.forEach(r=>{
+      const k = stageGroupKey(leadStage(r));
+      counts[k]++;
+      const at = enteredCurrentStageAt(r);
+      if(at) hereNow[k].push(Math.max(0,(now-at)/DAY_MS));
+    });
+
+    /* Finished stays (the lead moved on) come from ALL Meta leads, not just the filtered ones. */
+    dedupeContactsMostRecent(GHL_ROWS.filter(isMetaSourced)).forEach(r=>{
+      const path = parseStagePath(r);
+      for(let i=0;i<path.length-1;i++){
+        if(path[i].at && path[i+1].at){
+          moved[stageGroupKey(path[i].stage)].push(Math.max(0,(path[i+1].at-path[i].at)/DAY_MS));
+        }
+      }
+    });
+
+    const total = uniqueMetaLeads.length;
+    const pct = n => total ? Math.round(n/total*100) + '%' : '0%';
+    const row = (label, note, k) => `<tr><td class="name-cell">${label}</td><td>${note}</td><td>${counts[k]}</td><td>${pct(counts[k])}</td><td>${counts[k] ? fmtDays(hereNow[k]) : 'No leads here'}</td><td>${fmtDays(moved[k])}</td></tr>`;
+    let html = STAGE_GROUPS.map(g=>row(g.label, g.note, g.key)).join('');
+    if(counts.other) html += row('Other / unmapped', 'Stage name not in the groups above', 'other');
+    body.innerHTML = total ? html : '<tr><td colspan="6" style="text-align:center;color:var(--light-muted);font-family:Inter,sans-serif;">No Meta leads in this date range.</td></tr>';
+
+    /* Time to Closed Won: lead created -> entered Closed Won. */
+    const closeEl = document.getElementById('meta-close-time');
+    if(closeEl){
+      const spans = [];
+      dedupeContactsMostRecent(GHL_ROWS.filter(isMetaSourced)).forEach(r=>{
+        if(leadStage(r) !== 'Closed Won') return;
+        const at = enteredCurrentStageAt(r);
+        const created = r['Created At'] ? new Date(r['Created At']) : null;
+        if(at && created && !isNaN(created) && at >= created) spans.push((at-created)/DAY_MS);
+      });
+      closeEl.innerHTML = spans.length
+        ? '<strong>Time to Closed Won:</strong> ' + (spans.reduce((a,b)=>a+b,0)/spans.length).toFixed(1) + ' days on average from lead to Closed Won (' + spans.length + ' client' + (spans.length===1?'':'s') + ').'
+        : '<strong>Time to Closed Won:</strong> collecting data. This fills in as stage-change dates sync from GHL.';
+    }
+  }
+
+  /* Part 2: week-by-week cohorts. Ignores the main date filter on purpose, so
+     last week's leads stay visible while you look at this week. */
+  const wbody = document.getElementById('meta-stage-week-body');
+  if(!wbody) return;
+  const all = dedupeContactsMostRecent(GHL_ROWS.filter(isMetaSourced));
+  const weeks = {};
+  all.forEach(r=>{
+    if(!r['Created At']) return;
+    const d = parseDateSafe(r['Created At']);
+    if(isNaN(d)) return;
+    const ws = weekStartSunday(d);
+    const key = ws.getTime();
+    if(!weeks[key]) weeks[key] = { start: ws, total:0, warm:0, cold:0, followup:0, appt:0, won:0, other:0 };
+    weeks[key].total++;
+    weeks[key][stageGroupKey(leadStage(r))]++;
+  });
+  const keys = Object.keys(weeks).map(Number).sort((a,b)=>b-a).slice(0, 8);
+  const thisWeek = weekStartSunday(new Date()).getTime();
+  const fmt = d => d.toLocaleDateString(undefined,{month:'short', day:'numeric'});
+  wbody.innerHTML = keys.length ? keys.map(k=>{
+    const w = weeks[k];
+    const end = new Date(w.start); end.setDate(end.getDate()+6);
+    const label = fmt(w.start) + ' \u2013 ' + fmt(end) + (k === thisWeek ? ' (this week)' : '');
+    const working = w.warm + w.followup + w.appt;
+    return `<tr><td class="name-cell">${label}</td><td>${w.total}</td><td>${w.warm}</td><td>${w.cold}</td><td>${w.followup}</td><td>${w.appt}</td><td>${w.won}</td><td>${w.other}</td><td>${working}</td></tr>`;
+  }).join('') : '<tr><td colspan="9" style="text-align:center;color:var(--light-muted);font-family:Inter,sans-serif;">No Meta leads yet.</td></tr>';
 }
 
 /* ---------- Skool tab ---------- */

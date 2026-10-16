@@ -183,7 +183,7 @@
 
   .section-label{
     font-family:'IBM Plex Mono',monospace; font-size:13px; letter-spacing:0.14em;
-    color:var(--royal-onlight); text-transform:uppercase; margin:88px 0 18px; font-weight:600;
+    color:var(--royal-onlight); text-transform:uppercase; margin:120px 0 18px; font-weight:600;
   }
   .section-label:first-child{ margin-top:0; }
 
@@ -489,18 +489,18 @@
 #cj .cj-glass{background:var(--glass);border:1px solid var(--rim);box-shadow:var(--shadow)}
 #cj .cj-canvas{position:relative;border-radius:16px;overflow:hidden}
 #cj .cj-canvas::before{content:"";position:absolute;inset:0;background-image:radial-gradient(var(--dots) 1px,transparent 1.2px);background-size:20px 20px;pointer-events:none;-webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 30%,#000 30%,transparent 80%);mask-image:radial-gradient(ellipse 80% 70% at 50% 30%,#000 30%,transparent 80%)}
-#cj .cj-head{position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 16px;padding:22px 26px 0}
+#cj .cj-head{position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 16px;padding:16px 22px 0}
 #cj .cj-head h1{margin:0;font-family:var(--f-display);font-weight:700;font-size:28px;letter-spacing:-.005em;line-height:1.1;color:var(--ink)}
-#cj .cj-sub{color:var(--muted);font-size:13.5px;margin-top:3px}
+#cj .cj-sub{color:var(--muted);font-size:12.5px}
 #cj .cj-status{display:flex;flex-wrap:wrap;gap:6px}
-#cj .cj-stat{display:inline-flex;align-items:center;gap:8px;padding:6px 11px;border-radius:999px;border:1px solid var(--rim);font-size:12.5px;color:var(--muted);background:var(--glass2);box-shadow:inset 0 1px 0 var(--hi)}
+#cj .cj-stat{display:inline-flex;align-items:center;gap:8px;padding:5px 10px;border-radius:999px;border:1px solid var(--rim);font-size:12px;color:var(--muted);background:var(--glass2);box-shadow:inset 0 1px 0 var(--hi)}
 #cj .cj-stat i{width:8px;height:8px;border-radius:50%;box-shadow:0 0 10px currentColor}
 #cj .cj-stat b{color:var(--ink);font-family:var(--f-mono);font-weight:600}
 #cj .cj-legend{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:6px 18px;padding:12px 26px 0;font-size:12px;color:var(--muted)}
 #cj .cj-legend span{display:inline-flex;align-items:center;gap:7px}
 #cj .cj-legend i{width:8px;height:8px;border-radius:50%}
 #cj .cj-legend b{font-weight:600;color:var(--ink)}
-#cj .cj-mapwrap{position:relative;z-index:1;overflow-x:auto;padding:10px 16px 16px}
+#cj .cj-mapwrap{position:relative;z-index:1;overflow-x:auto;padding:8px 14px 14px}
 #cj #cj-map{display:block;width:100%;min-width:960px;height:auto;overflow:visible}
 
 /* SVG motion */
@@ -519,31 +519,31 @@
 
 /* Insight bar */
 #cj .cj-bar{position:relative;z-index:1;display:grid;grid-template-columns:minmax(300px,1.1fr) minmax(0,1.45fr) minmax(230px,1fr) auto;align-items:stretch;border-top:1px solid var(--rim);background:linear-gradient(180deg,var(--glass2),var(--glass))}
-#cj .cj-bar>div{padding:16px 22px;min-width:0}
+#cj .cj-bar>div{padding:14px 20px;min-width:0}
 #cj .cj-bar>div+div{border-left:1px solid var(--rim)}
 #cj .cj-bar.cj-sumbar{grid-template-columns:minmax(300px,.9fr) minmax(0,2.2fr) minmax(210px,.8fr) auto}
-#cj .cj-who{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+#cj .cj-who{display:flex;gap:14px;align-items:center}
 #cj .cj-who>div:last-child{min-width:0}
-#cj .cj-num{font-family:var(--f-display);font-weight:700;font-size:44px;line-height:.9;letter-spacing:-.02em;color:var(--brand);font-variant-numeric:tabular-nums}
-#cj .cj-who h2{margin:2px 0 0;font-family:var(--f-display);font-weight:600;font-size:21px;line-height:1.12;color:var(--ink)}
+#cj .cj-num{font-family:var(--f-display);font-weight:700;font-size:32px;line-height:.9;letter-spacing:-.02em;color:var(--brand);font-variant-numeric:tabular-nums}
+#cj .cj-who h2{margin:2px 0 0;font-family:var(--f-display);font-weight:600;font-size:17px;line-height:1.12;color:var(--ink)}
 #cj .cj-chip{white-space:normal;max-width:100%;display:inline-flex;align-items:center;gap:7px;margin-top:7px;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:600;border:1px solid currentColor;border-color:color-mix(in srgb,currentColor 30%,transparent)}
 #cj .cj-chip i{width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor}
 #cj .cj-c-ok{color:var(--ok);background:var(--ok-soft)}#cj .cj-c-warn{color:var(--warn);background:var(--warn-soft)}#cj .cj-c-bad{color:var(--bad);background:var(--bad-soft)}#cj .cj-c-none{color:var(--muted);background:var(--none-soft)}
 #cj .cj-ahead{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ok);background:var(--ok-soft);vertical-align:middle}
 #cj .cj-say{display:flex;flex-direction:column;justify-content:center;gap:8px}
-#cj .cj-say p{margin:0;font-size:15.5px;line-height:1.5;font-weight:500;color:var(--ink)}
-#cj .cj-sig{display:flex;gap:9px;align-items:center;font-size:12.5px;color:var(--bad);font-weight:500}
+#cj .cj-say p{margin:0;font-size:13.5px;line-height:1.5;font-weight:500;color:var(--ink)}
+#cj .cj-sig{display:flex;gap:9px;align-items:center;font-size:12px;color:var(--bad);font-weight:500}
 #cj .cj-sig i{flex:none;width:7px;height:7px;border-radius:50%;background:var(--bad);box-shadow:0 0 8px var(--bad);animation:cj-blink 2.6s ease-in-out infinite}
 @keyframes cj-blink{50%{opacity:.45}}
 #cj .cj-kpi{display:flex;flex-direction:column;justify-content:center;gap:4px}
 #cj .cj-kpi .cj-row{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
-#cj .cj-kpi .cj-b{font-family:var(--f-display);font-weight:600;font-size:22px;color:var(--muted);font-variant-numeric:tabular-nums}
-#cj .cj-kpi .cj-a{font-family:var(--f-display);font-weight:700;font-size:34px;line-height:1;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+#cj .cj-kpi .cj-b{font-family:var(--f-display);font-weight:600;font-size:17px;color:var(--muted);font-variant-numeric:tabular-nums}
+#cj .cj-kpi .cj-a{font-family:var(--f-display);font-weight:700;font-size:26px;line-height:1;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
 #cj .cj-kpi .cj-ar{color:var(--faint);font-size:16px}
-#cj .cj-kpi .cj-k{font-size:12px;color:var(--muted)}
+#cj .cj-kpi .cj-k{font-size:11.5px;color:var(--muted)}
 #cj .cj-ctl{display:flex;flex-direction:column;justify-content:center;gap:10px;align-items:flex-end}
 #cj .cj-btns{display:flex;gap:7px}
-#cj .cj-btn{border:1px solid var(--rim2);background:var(--glass2);color:var(--ink);padding:9px 15px;border-radius:9px;font-weight:600;font-size:13px;box-shadow:inset 0 1px 0 var(--hi);transition:transform .15s,box-shadow .2s}
+#cj .cj-btn{border:1px solid var(--rim2);background:var(--glass2);color:var(--ink);padding:8px 14px;border-radius:9px;font-weight:600;font-size:12.5px;box-shadow:inset 0 1px 0 var(--hi);transition:transform .15s,box-shadow .2s}
 #cj .cj-btn:hover:not(:disabled){transform:translateY(-1px)}
 #cj .cj-btn.cj-primary{background:var(--brand);border-color:transparent;color:#fff;min-width:128px;box-shadow:0 8px 18px -10px var(--brand-2)}
 #cj .cj-btn:disabled{opacity:.35;cursor:default}
@@ -552,15 +552,15 @@
 #cj .cj-prog i.cj-on{background:var(--brand);box-shadow:0 0 8px var(--brand)}
 #cj .cj-prog span{margin-left:7px;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
 #cj details.cj-more{grid-column:1/-1;border-top:1px solid var(--rim);padding:0 22px;background:var(--glass)}
-#cj details.cj-more summary{cursor:pointer;list-style:none;padding:11px 0;font-size:12.5px;font-weight:600;color:var(--brand);display:flex;gap:8px;align-items:center;letter-spacing:.02em}
+#cj details.cj-more summary{cursor:pointer;list-style:none;padding:10px 0;font-size:12px;font-weight:600;color:var(--brand);display:flex;gap:8px;align-items:center;letter-spacing:.02em}
 #cj details.cj-more summary::-webkit-details-marker{display:none}
 #cj details.cj-more summary::after{content:"";width:7px;height:7px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .2s}
 #cj details.cj-more[open] summary::after{transform:rotate(-135deg) translateY(-2px)}
 #cj .cj-mgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:2px 0 18px}
-#cj .cj-mcard{padding:14px 16px;border-radius:12px;background:var(--glass2);border:1px solid var(--rim);box-shadow:inset 0 1px 0 var(--hi)}
+#cj .cj-mcard{padding:12px 14px;border-radius:12px;background:var(--glass2);border:1px solid var(--rim);box-shadow:inset 0 1px 0 var(--hi)}
 #cj .cj-mcard .cj-label{display:flex;align-items:center;gap:8px;margin-bottom:6px}
 #cj .cj-mcard .cj-label i{width:6px;height:6px;border-radius:50%;background:var(--brand)}
-#cj .cj-mcard p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ink)}
+#cj .cj-mcard p{margin:0;font-size:12.5px;line-height:1.55;color:var(--ink)}
 #cj .cj-mcard.cj-act{background:linear-gradient(180deg,var(--ok-soft),transparent),var(--glass2);border-color:color-mix(in srgb,var(--ok) 30%,transparent)}
 #cj .cj-mcard.cj-act .cj-label i{background:var(--ok)}
 #cj .cj-sum{display:grid;gap:8px}
@@ -571,10 +571,10 @@
 #cj .cj-step.cj-s-warn{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 30%,transparent)}
 #cj .cj-step.cj-s-ok{background:var(--ok-soft);border-color:color-mix(in srgb,var(--ok) 30%,transparent)}
 #cj .cj-to{color:var(--bad);font-family:var(--f-mono);font-size:12px}
-#cj .cj-pri{display:grid;gap:6px;font-size:13px;color:var(--ink)}
+#cj .cj-pri{display:grid;gap:6px;font-size:12px;color:var(--ink)}
 #cj .cj-pri div{display:flex;gap:10px;align-items:baseline}
-#cj .cj-pri b{font-family:var(--f-display);color:var(--brand);font-size:17px}
-#cj .cj-txt{font-family:var(--f-display);font-weight:600;font-size:17px;line-height:1.25}
+#cj .cj-pri b{font-family:var(--f-display);color:var(--brand);font-size:14px}
+#cj .cj-txt{font-family:var(--f-display);font-weight:600;font-size:15px;line-height:1.25}
 
 @media (prefers-reduced-motion: reduce){#cj *,#cj *::before,#cj *::after{animation:none!important;transition:none!important}}
 @media (max-width:980px){
@@ -2521,21 +2521,21 @@ const CJ_LINKS = [
 ];
 const CJ_STAGE_META = [
   { n:1, name:'Offer', lc:'C2C Funding Program', checks:['offer'],
-    why:'The offer is why a stranger stops and raises a hand. When fewer people respond per 1,000 who see it, every stage after it starts with less.' },
+    why:'The offer is what makes someone stop and sign up. If fewer people respond to it, every stage after it gets fewer leads.' },
   { n:2, name:'Marketing', lc:'Meta Ads · Landing Page', checks:['leadsPace','qualified','cpl','lpconv'],
-    why:'Marketing fills the pipeline. Lead volume, lead quality and cost decide how much the rest of the system has to work with.' },
+    why:'Marketing brings in the leads. How many leads, how good they are and what each one costs decide how much work the rest of the team has.' },
   { n:3, name:'AI Intake', lc:'AI John', checks:['replyBooked','replyRate'],
-    why:'The AI is the first reply and the booking. A lead that replies and does not book is a lead the system had and lost.' },
-  { n:4, name:'Customer Service & Booking', lc:'After the Booking', checks:['stuck','followupDays'],
-    why:'Once an appointment is booked, people carry it. No-shows, reschedules and stalled follow-ups turn booked appointments into nothing.' },
-  { n:5, name:'Sales', lc:'Jay and the Team', checks:['apptToClient'],
-    why:'Appointments only pay when they become clients. This is where ad spend turns into revenue.' },
+    why:'The AI is the first to talk to a new lead and book the appointment. A lead who replies but never books is one we nearly had.' },
+  { n:4, name:'Customer Service & Booking', lc:'Follow-Up & Appointments', checks:['stuck','followupDays'],
+    why:'Once a lead is in follow-up, they need to keep moving. Leads that sit too long go cold and never book.' },
+  { n:5, name:'Sales', lc:'Sales Team', checks:['apptToClient'],
+    why:'Sales turns booked appointments into paying clients. This is where ad spend becomes revenue.' },
   { n:6, name:'Acquisition', lc:'New Clients', checks:['newClients','cpa'],
-    why:'New clients are the result everything else exists to produce, and cost per client is what makes the ads profitable.' },
+    why:'New clients are the goal of everything else. Cost per client shows whether the ads are paying off.' },
   { n:7, name:'Onboarding', lc:'Joining the Community', checks:['salesReadyJoined'],
-    why:'A client who does not join cannot be funded. Onboarding turns a purchase into a client.' },
+    why:'A client who does not get set up and join the community cannot be funded.' },
   { n:8, name:'Funding', lc:'Business Funding', checks:['funding'],
-    why:'Funding is the outcome the client paid for and where Jay earns his revenue. Clients waiting past the window are the ones that stop referring.' }
+    why:'Funding is what the client paid for. Clients who wait too long are the ones who stop recommending us.' }
 ];
 
 /* ---------- formatting ---------- */
@@ -2645,8 +2645,8 @@ function cjBuildContext(now){
 const CJ_CHECKS = {
   offer: { id:'offer', label:'Leads per 1,000 people reached', short:'Leads per 1,000 Seen', type:'higher', unit:'n1', seed:CJ_SEED.offerPer1k, min:2000, needsMeta:true,
     calc:(C,w)=>{ const m=C.metaIn(w), L=C.leadsIn(w).length; return { v: m.imp ? L / m.imp * 1000 : null, n: m.imp, L, imp: m.imp }; },
-    drive:(x)=>`Only ${cjFmt(x.value,'n1')} leads per 1,000 impressions, against a target of ${cjFmt(x.target,'n1')}.`,
-    act:()=>'Review the offer message and the hook in the ad.' },
+    drive:(x)=>`Only ${cjFmt(x.value,'n1')} leads for every 1,000 people who saw the ad.`,
+    act:()=>'Look at the offer and the first line of the ad. Test a stronger hook.' },
   leadsPace: { id:'leadsPace', label:'Leads', short:'Leads', type:'pace', unit:'int', seedPerDay:CJ_SEED.leadsPerWeek/7, noun:'leads',
     calc:(C,w)=>({ v: C.leadsIn(w).length, n: C.leadsIn(w).length }),
     perDay:(C)=>{
@@ -2660,16 +2660,16 @@ const CJ_CHECKS = {
       }
       return counts.length >= 2 ? counts.reduce((a,b)=>a+b,0) / counts.length / 7 : null;
     },
-    drive:(x)=>`${x.value} leads against ${Math.round(x.expected)} expected by now (${Math.round(x.pace*100)}% of pace).`,
-    act:()=>'Check budget pacing and ad delivery in Meta, then cost per lead.' },
+    drive:(x)=>`${x.value} leads so far.`,
+    act:()=>'Check that the ads are spending their budget and showing up in Meta. Then look at cost per lead.' },
   qualified: { id:'qualified', label:'Qualified leads', short:'Qualified', type:'higher', unit:'pct', seed:CJ_SEED.qualified, min:20,
     calc:(C,w)=>{ const ls=C.leadsIn(w); const q=ls.filter(l=>l.qualified).length; return { v: ls.length ? q/ls.length : null, n: ls.length, q }; },
-    drive:(x)=>`${x.extra.q} of ${x.n} leads qualified (${cjFmt(x.value,'pct')}), against a target of ${cjFmt(x.target,'pct')}.`,
-    act:()=>'Review audience targeting and the form questions, and compare the qualified rate by ad.' },
+    drive:(x)=>`${x.extra.q} of ${x.n} leads were qualified (${cjFmt(x.value,'pct')}).`,
+    act:()=>'Check who the ads are reaching and the questions on the form. See which ads bring the best leads.' },
   cpl: { id:'cpl', label:'Cost per lead', short:'Cost per Lead', type:'lower', unit:'usd2', seed:CJ_SEED.cpl, warn:0.15, red:0.25, min:10, needsMeta:true,
     calc:(C,w)=>{ const m=C.metaIn(w), L=C.leadsIn(w).length; return { v: (L && m.spend) ? m.spend / L : null, n: L }; },
-    drive:(x)=>`Cost per lead is ${cjFmt(x.value,'usd2')} against a ${cjFmt(x.target,'usd2')} target (${Math.round((x.value/x.target-1)*100)}% over).`,
-    act:()=>'Review budget pacing, the audience and the creative. Get a backup ad ready.' },
+    drive:(x)=>`Each lead costs ${cjFmt(x.value,'usd2')}, ${Math.round((x.value/x.target-1)*100)}% over the ${cjFmt(x.target,'usd2')} goal.`,
+    act:()=>'Check the audience and the ad creative. Have a backup ad ready.' },
   freq: { id:'freq', label:'Ad frequency (last 7 days)', short:'Frequency', type:'abs', unit:'x', needsMeta:true,
     calc:(C)=>{
       const rows = C.meta.filter(m => (m.row['Frequency 7d'] || '') !== '').sort((a,b)=>b.d-a.d);
@@ -2682,8 +2682,8 @@ const CJ_CHECKS = {
   lpconv: { id:'lpconv', label:'Landing page conversion', short:'Page Conversion', type:'higher', unit:'pct', min:100, needsMeta:true,
     seedFn:(C,x)=> x.basis === 'link clicks' ? CJ_SEED.lpConvClicks : null,
     calc:(C,w)=>{ const m=C.metaIn(w), L=C.leadsIn(w).length; const den = m.clicks; return { v: den ? L/den : null, n: den, basis: 'link clicks' }; },
-    drive:(x)=>`${cjFmt(x.value,'pct')} of ${x.extra.basis} became leads, against a target of ${cjFmt(x.target,'pct')}.`,
-    act:()=>'Review the landing page: load speed, headline match with the ad, and the form.' },
+    drive:(x)=>`${cjFmt(x.value,'pct')} of people who clicked became leads.`,
+    act:()=>'Look at the landing page: how fast it loads, whether the headline matches the ad and how easy the form is.' },
   syncAge: { id:'syncAge', label:'Data refresh age', short:'Data Refresh', type:'abs', unit:'hrs',
     calc:(C)=>({ v: C.syncHours, n: C.syncHours === null ? 0 : 1 }),
     band:(v)=> v < 1 ? 'ok' : (v < 24 ? 'warn' : 'bad'),
@@ -2692,16 +2692,16 @@ const CJ_CHECKS = {
     act:()=>'Check the Apps Script triggers for the Meta and GoHighLevel syncs.' },
   replyBooked: { id:'replyBooked', label:'Replied to booked', short:'Replied → Booked', type:'higher', unit:'pct', seed:CJ_SEED.replyBooked, min:10,
     calc:(C,w)=>{ const ls=C.leadsIn(w).filter(l=>l.replied); const b=ls.filter(l=>l.bookedTag).length; return { v: ls.length ? b/ls.length : null, n: ls.length, b }; },
-    drive:(x)=>`${x.extra.b} of ${x.n} leads that replied booked (${cjFmt(x.value,'pct')}), against a target of ${cjFmt(x.target,'pct')}.`,
-    act:()=>"Review AI John's replies to leads who answered but did not book: tone, booking link and follow-up timing." },
+    drive:(x)=>`${x.extra.b} of ${x.n} leads who replied went on to book (${cjFmt(x.value,'pct')}).`,
+    act:()=>"Read AI John's chats with leads who replied but did not book. Check the tone, the booking link and the timing of follow-ups." },
   replyRate: { id:'replyRate', label:'Reply rate', short:'Reply Rate', type:'info', unit:'pct',
     calc:(C,w)=>{ const ls=C.leadsIn(w); const r=ls.filter(l=>l.replied).length; return { v: ls.length ? r/ls.length : null, n: ls.length, r }; } },
   stuck: { id:'stuck', label:'Leads Stuck in Follow-Up 14+ Days', short:'Stuck 14+ Days', type:'abs', unit:'pct', min:5,
     calc:(C,w)=>{ const ds=C.leadsIn(w).filter(l=>l.stage==='In Follow-Up' && l.entered).map(l=>(C.now-l.entered)/CJ_DAY); const k=ds.filter(d=>d>=14).length; return { v: ds.length ? k/ds.length : null, n: ds.length, k }; },
     band:(v)=> v <= 0.20 ? 'ok' : (v <= 0.40 ? 'warn' : 'bad'),
     targetText:'20% or less',
-    drive:(x)=>`${x.extra.k} of ${x.n} leads in Active Follow-Up have been there 14 days or more (${cjFmt(x.value,'pct')}). The goal is 20% or less.`,
-    act:()=>'Work the oldest follow-up leads first. Book them, move them forward or close them out.' },
+    drive:(x)=>`${x.extra.k} of ${x.n} leads have been in Active Follow-Up for 14 days or more (${cjFmt(x.value,'pct')}).`,
+    act:()=>'Start with the oldest leads. Book them, move them forward or close them out.' },
   followupDays: { id:'followupDays', label:'Days in Active Follow-Up', short:'Days in Follow-up', type:'info', unit:'days', seed:CJ_SEED.followupDays, warn:0.10, red:0.25, min:5,
     calc:(C,w)=>{ const ds=C.leadsIn(w).filter(l=>l.stage==='In Follow-Up' && l.entered).map(l=>(C.now-l.entered)/CJ_DAY); return { v: ds.length ? ds.reduce((a,b)=>a+b,0)/ds.length : null, n: ds.length }; },
     base:(C)=>cjCompletedStays(C,['In Follow-Up']),
@@ -2727,8 +2727,8 @@ const CJ_CHECKS = {
     act:()=>'Call rescheduled leads the day before to confirm.' },
   apptToClient: { id:'apptToClient', label:'Appointment to client', short:'Appt → Client', type:'higher', unit:'pct', seed:CJ_SEED.apptToClient, min:10,
     calc:(C,w)=>{ const ls=C.leadsIn(w).filter(l=>l.booked); const c=ls.filter(l=>l.isClient).length; return { v: ls.length ? c/ls.length : null, n: ls.length, c }; },
-    drive:(x)=>`${x.extra.c} of ${x.n} booked appointments became clients (${cjFmt(x.value,'pct')}), against a target of ${cjFmt(x.target,'pct')}.`,
-    act:()=>'Review the recordings of appointments that did not close and tighten the close.' },
+    drive:(x)=>`${x.extra.c} of ${x.n} booked appointments became clients (${cjFmt(x.value,'pct')}).`,
+    act:()=>'Listen to the calls that did not close and find where the sale is slipping.' },
   apptDays: { id:'apptDays', label:'Days in Appointment Stage', short:'Days in Appt Stage', type:'lower', unit:'days', warn:0.10, red:0.25, min:5,
     calc:(C,w)=>{ const ds=C.leadsIn(w).filter(l=>['Meeting Booked','Rescheduled','No Show'].includes(l.stage) && l.entered).map(l=>(C.now-l.entered)/CJ_DAY); return { v: ds.length ? ds.reduce((a,b)=>a+b,0)/ds.length : null, n: ds.length }; },
     base:(C)=>cjCompletedStays(C,['Meeting Booked','Rescheduled','No Show']),
@@ -2745,16 +2745,16 @@ const CJ_CHECKS = {
       }
       return months.length ? months.reduce((a,b)=>a+b,0)/months.length/30.4375 : null;
     },
-    drive:(x)=>{ const gap = Math.round((x.expected - x.value)*10)/10; const close = x.pace >= 0.65 && x.pace < 0.9; return `${x.value} new clients so far against a goal of ${(Math.round(x.expected*10)/10)} by now (${CJ_SEED.newClientsPerMonth} a month).` + (close ? ` That is close to target, about ${gap <= 1.5 ? 'one client' : gap + ' clients'} short, not seriously behind.` : ''); },
-    act:()=>'Review where booked appointments are stalling in Sales.' },
+    drive:(x)=>{ const gap = Math.round((x.expected - x.value)*10)/10; const close = x.pace >= 0.65 && x.pace < 0.9; return `${x.value} new clients so far.` + (close ? ` That is close, about ${gap <= 1.5 ? 'one client' : gap + ' clients'} short.` : ''); },
+    act:()=>'Look at where booked appointments are getting stuck.' },
   cpa: { id:'cpa', label:'Cost per client', short:'Cost per Client', type:'lower', unit:'usd0', seed:CJ_SEED.cpa, warn:0.15, red:0.25, min:1, baseMin:2, needsMeta:true,
     calc:(C,w)=>{ const m=C.metaIn(w); const n=C.leads.filter(l=>l.isClient && l.created>=w.start && l.created<=w.end).length; return { v: n ? m.spend/n : null, n }; },
-    drive:(x)=>`Cost per client is ${cjFmt(x.value,'usd0')} against a ${cjFmt(x.target,'usd0')} target.`,
-    act:()=>'Review cost per lead and the appointment-to-client rate; whichever is further off target is the lever.' },
+    drive:(x)=>`Each new client costs ${cjFmt(x.value,'usd0')}.`,
+    act:()=>'Check cost per lead and the close rate. Fix whichever is further from its goal.' },
   salesReadyJoined: { id:'salesReadyJoined', label:'Sales-ready to joined', short:'Sales-ready → Joined', type:'higher', unit:'pct', min:10,
     calc:(C,w)=>{ const ls=C.leadsIn(w).filter(l=>l.salesReady); const j=ls.filter(l=>l.isClient).length; return { v: ls.length ? j/ls.length : null, n: ls.length, j }; },
-    drive:(x)=>`${x.extra.j} of ${x.n} sales-ready opportunities joined (${cjFmt(x.value,'pct')}), against a target of ${cjFmt(x.target,'pct')}.`,
-    act:()=>'Call the sales-ready leads who have not joined and remove what is blocking them.' },
+    drive:(x)=>`${x.extra.j} of ${x.n} sales-ready leads joined (${cjFmt(x.value,'pct')}).`,
+    act:()=>'Call the sales-ready leads who have not joined and find out what is in the way.' },
   funding: { id:'funding', label:'Clients funded or on track', short:'Funded Or On Track', type:'funding', unit:'pct' }
 };
 
@@ -2865,24 +2865,24 @@ function cjCheckValueText(c){
 function cjCheckLine(c){
   if(c.type === 'funding'){
     if(!c.extra.clients) return 'No clients enrolled in this range.';
-    return `${c.extra.on} of ${c.extra.clients} enrolled clients are funded or inside the ${CJ_FUNDING_GREEN_DAYS}-day window` + (c.extra.past ? `; ${c.extra.past} past ${CJ_FUNDING_GREEN_DAYS} days.` : '.');
+    return `${c.extra.on} of ${c.extra.clients} clients are funded or still inside the ${CJ_FUNDING_GREEN_DAYS}-day window` + (c.extra.past ? `. ${c.extra.past} past ${CJ_FUNDING_GREEN_DAYS} days.` : '.');
   }
-  if(c.type === 'pace' && c.status !== 'none') return `${c.value} ${c.def.noun} so far. The goal by now is ${Math.round(c.expected*10)/10}, which is ${Math.round(c.pace*100)}% of the way there.`;
+  if(c.type === 'pace' && c.status !== 'none') return `${c.value} ${c.def.noun} so far. The goal by now is ${Math.round(c.expected*10)/10}.`;
   if(c.status === 'none'){
     const val = (c.value !== null && c.value !== undefined && !isNaN(c.value) && /needed\)/.test(c.note || '')) ? ` So far: ${cjFmt(c.value, c.unit)}.` : '';
     return `${c.label}: ${c.note || 'collecting data'}.${val}`;
   }
-  if(c.type === 'abs') return `${c.label} is ${cjFmt(c.value, c.unit)}, target ${c.targetText}.`;
+  if(c.type === 'abs') return `${c.label} is ${cjFmt(c.value, c.unit)}. The goal is ${c.targetText}.`;
   const diff = Math.round(Math.abs(c.ratio - 1) * 100);
-  if(diff === 0) return `${c.label} is ${cjFmt(c.value, c.unit)}, on the ${cjFmt(c.target, c.unit)} target.`;
+  if(diff === 0) return `${c.label} is ${cjFmt(c.value, c.unit)}, right on the ${cjFmt(c.target, c.unit)} goal.`;
   const dir = c.type === 'higher' ? (c.ratio >= 1 ? 'above' : 'below') : (c.ratio <= 1 ? 'below' : 'above');
-  if(c.status === 'ok' && dir === 'above' && c.type === 'lower') return `${c.label} is ${cjFmt(c.value, c.unit)}, ${diff}% above the ${cjFmt(c.target, c.unit)} target but still inside the On Track range.`;
-  return `${c.label} is ${cjFmt(c.value, c.unit)}, ${diff}% ${dir} the ${cjFmt(c.target, c.unit)} target.`;
+  if(c.status === 'ok' && dir === 'above' && c.type === 'lower') return `${c.label} is ${cjFmt(c.value, c.unit)}, a little above the ${cjFmt(c.target, c.unit)} goal but still on track.`;
+  return `${c.label} is ${cjFmt(c.value, c.unit)}, ${diff}% ${dir} the ${cjFmt(c.target, c.unit)} goal.`;
 }
 function cjStageLine(s){
   if(s.status === 'none'){
     const c = s.checks.find(x => x.scored);
-    return (c && c.note ? c.note + '. ' : '') + 'No scored result this period. This is the next place we will measure.';
+    return (c && c.note ? c.note + '. ' : '') + 'There is not enough data to score this stage yet.';
   }
   const bad = s.checks.filter(c => c.scored && c.status !== 'none' && c.status !== 'ok');
   if(bad.length) return bad.slice(0, 2).map(cjCheckLine).join(' ');
@@ -2893,8 +2893,8 @@ function cjDetails(s, R){
   const happening = s.checks.filter(c => c.scored).map(cjCheckLine).join(' ');
   const why = s.meta.why;
   let driving, act;
-  if(s.status === 'none'){ driving = 'Not measured yet. This is the next place we will measure.'; act = 'Keep collecting data. The score turns on automatically once there is enough.'; }
-  else if(!trip.length){ driving = 'No rule is tripped. Every scored check is at or above its target.'; act = 'No action needed. Keep the current approach and keep watching the weekly pace.'; }
+  if(s.status === 'none'){ driving = 'There is not enough data to score this yet.'; act = 'Keep collecting data. The score turns on by itself once there is enough.'; }
+  else if(!trip.length){ driving = 'Nothing is off target.'; act = 'Nothing to fix. Keep doing what is working.'; }
   else {
     driving = trip.map(c => c.def.drive ? c.def.drive(c) : cjCheckLine(c)).join(' ');
     const offerTrip = trip.some(c => c.id === 'offer');
@@ -2903,9 +2903,9 @@ function cjDetails(s, R){
       if(f && f.value !== null && f.value !== undefined && f.value >= 2.5) driving += ` Frequency is ${cjFmt(f.value,'x')}, so ad fatigue is part of this.`;
     }
     act = trip.map(c => c.def.act ? c.def.act(c) : '').filter(Boolean).join(' ');
-    if(trip.some(c => c.id === 'funding')){ driving = cjCheckLine(trip[0]); act = 'Review each enrolled client past ' + CJ_FUNDING_GREEN_DAYS + ' days and confirm the funding plan with Jay.'; }
+    if(trip.some(c => c.id === 'funding')){ driving = cjCheckLine(trip[0]); act = 'Check each client past ' + CJ_FUNDING_GREEN_DAYS + ' days and confirm the funding plan with Jay.'; }
   }
-  return [["What's happening", happening], ['Why it matters', why], ["What's driving it", driving], ["What we'll do", act]];
+  return [["What's Happening", happening], ['Why It Matters', why], ["What's Driving It", driving], ["What We'll Do", act]];
 }
 function cjSummary(R){
   const st = R.stages;
@@ -2925,8 +2925,8 @@ function cjSummary(R){
 const CJ_LBL = { ok:'On Track', warn:'Needs Improvement', bad:'Needs Immediate Attention', none:'Collecting Data' };
 const CJ_COL = { ok:'var(--ok)', warn:'var(--warn)', bad:'var(--bad)', none:'var(--none)' };
 const CJ_DH = ["What's happening", 'Why it matters', "What's driving it", "What we'll do"];
-const cjState = { mode:'sum', cur:-1, openDetails:false, R:null };
-const CJ_SP = 144, CJ_R = 33, CJ_BW = 138, CJ_NY = 134, CJ_H = 346;
+const cjState = { mode:'init', cur:-1, openDetails:false, R:null, seen:new Set() };
+const CJ_SP = 144, CJ_R = 30, CJ_BW = 138, CJ_NY = 134, CJ_H = 346;
 const cjX = i => 76 + i * CJ_SP;
 
 function cjShortNote(c){
@@ -2970,10 +2970,12 @@ function cjDefs(){
 }
 function cjDrawMap(R){
   const S = R.stages, st = cjState, run = st.mode === 'run';
+  const showBox = i => st.mode === 'sum' || (run && st.seen.has(i));
+  let maxBottom = CJ_NY + CJ_R + 62 + 22;
   const FL = {};
   if(run){ const c = st.cur + 1; R.links.forEach(l => { if(l[1] === c) FL[l[0]-1] = 'AFFECTS STAGE ' + c; if(l[0] === c) FL[l[1]-1] = 'AFFECTED BY STAGE ' + c; }); }
   let g = cjDefs();
-  if(!run){
+  if(st.mode === 'sum'){
     const late = S.slice(5).filter(s => ['warn','bad'].includes(s.status)).length;
     if(late >= 2){
       const za = cjX(5) - CJ_BW/2 - 10, zb = cjX(7) + CJ_BW/2 + 10;
@@ -2983,7 +2985,7 @@ function cjDrawMap(R){
     }
   }
   CJ_PHASES.forEach(p => { const a = cjX(p[0]) - CJ_BW/2, b = cjX(p[1]) + CJ_BW/2;
-    g += '<circle cx="' + (a+3) + '" cy="12" r="3" fill="var(--brand)"/><text x="' + (a+13) + '" y="16" font-size="11.5" letter-spacing="2" fill="var(--muted)" font-family="var(--f-mono)">' + p[2] + '</text><rect x="' + a + '" y="26" width="' + (b-a) + '" height="1.5" fill="url(#cj-phl)"/>'; });
+    g += '<circle cx="' + (a+3) + '" cy="12" r="3" fill="var(--brand)"/><text x="' + (a+13) + '" y="16" font-size="10.5" letter-spacing="2" fill="var(--muted)" font-family="var(--f-mono)">' + p[2] + '</text><rect x="' + a + '" y="26" width="' + (b-a) + '" height="1.5" fill="url(#cj-phl)"/>'; });
   g += '<line x1="' + cjX(0) + '" x2="' + cjX(7) + '" y1="' + CJ_NY + '" y2="' + CJ_NY + '" stroke="var(--track)" stroke-width="10" stroke-linecap="round"/>';
   g += '<line x1="' + cjX(0) + '" x2="' + cjX(7) + '" y1="' + (CJ_NY-2) + '" y2="' + (CJ_NY-2) + '" stroke="var(--track-hi)" stroke-width="1.5" stroke-linecap="round" opacity=".6"/>';
   const pe = run ? st.cur : 7;
@@ -3001,34 +3003,37 @@ function cjDrawMap(R){
     if(isSrc) g += '<circle class="cj-halo" cx="' + x + '" cy="' + CJ_NY + '" r="' + CJ_R + '" fill="none" stroke="var(--bad)" stroke-width="5"/><circle cx="' + x + '" cy="' + CJ_NY + '" r="' + (CJ_R+4) + '" fill="var(--bad)" opacity=".18" filter="url(#cj-glow)"/>';
     g += '<circle cx="' + x + '" cy="' + CJ_NY + '" r="' + CJ_R + '" fill="url(#cj-f-' + k + ')" stroke="url(#cj-r-' + k + ')" stroke-width="4"/>';
     g += '<circle cx="' + x + '" cy="' + CJ_NY + '" r="' + (CJ_R-7) + '" fill="var(--core)"/><circle class="cj-core" cx="' + x + '" cy="' + CJ_NY + '" r="' + (CJ_R-7) + '" fill="url(#cj-c-' + k + ')" stroke="' + CJ_COL[k] + '" stroke-opacity=".35" stroke-width="1"/>';
-    g += '<text x="' + x + '" y="' + (CJ_NY+8.5) + '" text-anchor="middle" font-size="24" font-weight="700" fill="var(--ink)" font-family="var(--f-display)">' + s.n + '</text>';
+    g += '<text x="' + x + '" y="' + (CJ_NY+7) + '" text-anchor="middle" font-size="20" font-weight="700" fill="var(--ink)" font-family="var(--f-display)">' + s.n + '</text>';
     if(isSrc){ const w = FL[i].length > 16 ? 156 : 128; g += '<g filter="url(#cj-soft)"><rect x="' + (x-w/2) + '" y="' + (CJ_NY-CJ_R-34) + '" width="' + w + '" height="22" rx="11" fill="var(--bad)"/></g><text x="' + x + '" y="' + (CJ_NY-CJ_R-19) + '" text-anchor="middle" font-size="10.5" font-weight="700" letter-spacing="1" fill="#fff" font-family="var(--f-mono)">' + FL[i] + '</text>'; }
     const nm = s.name.split(' '), two = nm.length > 1 && s.name.length > 12;
-    g += '<text x="' + x + '" y="' + (CJ_NY+CJ_R+24) + '" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)" font-family="var(--f-body)">' + (two ? '<tspan x="' + x + '">' + cjEsc(nm[0]) + '</tspan><tspan x="' + x + '" dy="17">' + cjEsc(nm.slice(1).join(' ')) + '</tspan>' : cjEsc(s.name)) + '</text>';
-    g += '<text x="' + x + '" y="' + (CJ_NY+CJ_R+(two ? 62 : 44)) + '" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="var(--f-body)">' + cjEsc(s.lc) + '</text>';
-    const by = CJ_NY + CJ_R + 76, rows = cjBoxRows(s), bh = rows.length * 44 + 12, bc = CJ_COL[k];
+    g += '<text x="' + x + '" y="' + (CJ_NY+CJ_R+24) + '" text-anchor="middle" font-size="13.5" font-weight="600" fill="var(--ink)" font-family="var(--f-body)">' + (two ? '<tspan x="' + x + '">' + cjEsc(nm[0]) + '</tspan><tspan x="' + x + '" dy="16">' + cjEsc(nm.slice(1).join(' ')) + '</tspan>' : cjEsc(s.name)) + '</text>';
+    g += '<text x="' + x + '" y="' + (CJ_NY+CJ_R+(two ? 58 : 42)) + '" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="var(--f-body)">' + cjEsc(s.lc) + '</text>';
+    const by = CJ_NY + CJ_R + 72, rows = cjBoxRows(s), bh = rows.length * 44 + 12, bc = CJ_COL[k];
+    if(!showBox(i)){ g += '</g>'; return; }
+    maxBottom = Math.max(maxBottom, by + bh);
     g += '<g class="cj-pop"><rect x="' + (x-CJ_BW/2) + '" y="' + by + '" width="' + CJ_BW + '" height="' + bh + '" rx="10" fill="var(--box)" stroke="var(--boxline)" filter="url(#cj-soft)"/>';
     g += '<rect x="' + (x-CJ_BW/2) + '" y="' + by + '" width="' + CJ_BW + '" height="' + bh + '" rx="10" fill="none" stroke="' + bc + '" stroke-opacity=".55"/><rect x="' + (x-CJ_BW/2+14) + '" y="' + by + '" width="' + (CJ_BW-28) + '" height="2.5" rx="1.25" fill="' + bc + '"/>';
     rows.forEach((r, j) => { const yy = by + 24 + j * 44;
-      g += '<text x="' + x + '" y="' + yy + '" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="var(--f-body)">' + cjEsc(r[0]) + '</text>';
-      g += '<text x="' + x + '" y="' + (yy+19) + '" text-anchor="middle" font-size="' + (r[2] ? 13 : 15) + '" font-weight="' + (r[2] ? 500 : 700) + '" fill="' + (r[2] ? 'var(--muted)' : 'var(--ink)') + '" font-family="var(--f-body)">' + cjEsc(r[1]) + '</text>'; });
+      g += '<text x="' + x + '" y="' + yy + '" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="var(--f-body)">' + cjEsc(r[0]) + '</text>';
+      g += '<text x="' + x + '" y="' + (yy+19) + '" text-anchor="middle" font-size="' + (r[2] ? 12 : 13.5) + '" font-weight="' + (r[2] ? 500 : 700) + '" fill="' + (r[2] ? 'var(--muted)' : 'var(--ink)') + '" font-family="var(--f-body)">' + cjEsc(r[1]) + '</text>'; });
     g += '</g></g>';
   });
   const svg = document.getElementById('cj-map');
-  svg.setAttribute('viewBox', '0 0 1160 ' + (CJ_H + 14));
+  svg.setAttribute('viewBox', '0 0 1160 ' + (maxBottom + 16));
   svg.innerHTML = g;
   svg.querySelectorAll('.cj-node').forEach(n => {
-    const go = () => { cjState.mode = 'run'; cjState.cur = +n.dataset.i; cjRender(); };
+    const go = () => { cjState.mode = 'run'; cjState.cur = +n.dataset.i; cjState.seen.add(cjState.cur); cjRender(); };
     n.addEventListener('click', go);
     n.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(); } });
   });
 }
 
-function cjProg(n){ let h = '<div class="cj-prog">'; for(let i = 0; i < 8; i++) h += '<i class="' + (i < n ? 'cj-on' : '') + '"></i>'; return h + '<span>' + (cjState.mode === 'sum' ? '8 stages' : (cjState.cur + 1) + ' / 8') + '</span></div>'; }
+function cjProg(n){ let h = '<div class="cj-prog">'; for(let i = 0; i < 8; i++) h += '<i class="' + (i < n ? 'cj-on' : '') + '"></i>'; return h + '<span>' + (cjState.mode === 'run' ? (cjState.cur + 1) + ' / 8' : '8 stages') + '</span></div>'; }
 function cjCtl(){
-  const sum = cjState.mode === 'sum';
-  const nextLabel = sum ? 'Step through' : (cjState.cur === 7 ? 'Summary' : 'Next stage');
-  return '<div class="cj-ctl">' + cjProg(sum ? 8 : cjState.cur + 1) + '<div class="cj-btns"><button class="cj-btn" id="cj-back"' + (sum ? ' disabled' : '') + '>Back</button><button class="cj-btn cj-primary" id="cj-next">' + nextLabel + '</button></div></div>';
+  const m = cjState.mode;
+  const nextLabel = m === 'init' ? 'Step Through' : (m === 'sum' ? 'Start Over' : (cjState.cur === 7 ? 'Summary' : 'Next Stage'));
+  const prog = m === 'run' ? cjState.cur + 1 : (m === 'sum' ? 8 : 0);
+  return '<div class="cj-ctl">' + cjProg(prog) + '<div class="cj-btns"><button class="cj-btn" id="cj-back"' + (m === 'init' ? ' disabled' : '') + '>Back</button><button class="cj-btn cj-primary" id="cj-next">' + nextLabel + '</button></div></div>';
 }
 function cjCards(arr, actIdx){ return arr.map((c, j) => '<div class="cj-mcard' + (j === actIdx ? ' cj-act' : '') + '"><div class="cj-label"><i></i>' + cjEsc(c[0]) + '</div><p>' + cjEsc(c[1]) + '</p></div>').join(''); }
 function cjHeadlineKpi(s){
@@ -3051,25 +3056,25 @@ function cjDrawBar(R){
   const bar = document.getElementById('cj-bar'), st = cjState;
   const S = R.stages, sm = cjSummary(R);
   let h = '';
-  if(st.mode === 'sum'){
+  if(st.mode !== 'run'){
     const total = sm.cnt.bad + sm.cnt.warn;
-    const chip = sm.cnt.bad ? '<span class="cj-chip cj-c-bad"><i></i>' + total + ' need attention</span>' : sm.cnt.warn ? '<span class="cj-chip cj-c-warn"><i></i>' + total + ' need improvement</span>' : sm.cnt.ok ? '<span class="cj-chip cj-c-ok"><i></i>On track</span>' : '<span class="cj-chip cj-c-none"><i></i>Collecting data</span>';
+    const chip = sm.cnt.bad ? '<span class="cj-chip cj-c-bad"><i></i>' + total + ' Need Attention</span>' : sm.cnt.warn ? '<span class="cj-chip cj-c-warn"><i></i>' + total + ' Need Improvement</span>' : sm.cnt.ok ? '<span class="cj-chip cj-c-ok"><i></i>On Track</span>' : '<span class="cj-chip cj-c-none"><i></i>Collecting Data</span>';
     const stepChip = (s, cls) => '<span class="cj-step ' + (cls || '') + '" data-st="' + (s.n-1) + '">' + cjEsc(s.name.replace(' & Booking','')) + '</span>';
     let connect = '';
     if(R.links.length) connect += '<div class="cj-row2"><span class="cj-tagk">AFFECTING EACH OTHER</span>' + R.links.map(l => stepChip(S[l[0]-1], S[l[0]-1].status === 'warn' ? 'cj-s-warn' : '') + '<span class="cj-to">→</span>' + stepChip(S[l[1]-1], S[l[1]-1].status === 'warn' ? 'cj-s-warn' : '')).join('<span style="width:10px"></span>') + '</div>';
     if(sm.attention.length) connect += '<div class="cj-row2"><span class="cj-tagk">NEEDS ATTENTION</span>' + sm.attention.map(s => stepChip(s, s.status === 'warn' ? 'cj-s-warn' : '')).join('') + '</div>';
     if(!connect) connect = '<p>' + (sm.cnt.ok ? 'Every scored stage is on track, so nothing is affecting anything else right now.' : 'Not enough data yet to score the journey.') + '</p>';
     const pri = sm.actions.length ? '<div class="cj-pri">' + sm.actions.map((a, i) => '<div><b>' + (i+1) + '</b>' + cjEsc(a[0].name.replace(' & Booking','') + ': ' + a[1]) + '</div>').join('') + '</div>' : '<div class="cj-pri"><div>Nothing needs fixing right now.</div></div>';
-    h = '<div class="cj-who"><div class="cj-num">8/8</div><div><div class="cj-label">Scorecard summary</div><h2>' + cjEsc(sm.head) + '</h2>' + chip + '</div></div>' +
+    h = '<div class="cj-who"><div class="cj-num">' + sm.cnt.ok + '/8</div><div><div class="cj-label">Stages On Track</div><h2>' + cjEsc(sm.head) + '</h2>' + chip + '</div></div>' +
       '<div class="cj-say"><div class="cj-label">How they connect</div><div class="cj-sum">' + connect + '</div></div>' +
       '<div class="cj-kpi"><div class="cj-label">Start with</div>' + pri + '</div>' + cjCtl();
     const worstLines = sm.attention.slice(0, 3).map(s => cjStageLine(s)).join(' ');
-    const linkLines = R.links.length ? R.links.map(l => 'Stage ' + l[0] + ' is affecting Stage ' + l[1] + '. ' + l[2]).join(' ') : 'No two stages are off track at the same time, so no stage is affecting another right now.';
+    const linkLines = R.links.length ? R.links.map(l => 'Stage ' + l[0] + ' is affecting Stage ' + l[1] + '. ' + l[2]).join(' ') : 'No two stages are off track at the same time, so none is hurting another right now.';
     h += '<details class="cj-more"' + (st.openDetails ? ' open' : '') + '><summary>Details</summary><div class="cj-mgrid">' + cjCards([
-      ["What's happening", sm.cnt.ok + ' on track, ' + sm.cnt.warn + ' need improvement, ' + sm.cnt.bad + ' need immediate attention, ' + sm.cnt.none + ' collecting data.'],
-      ['How it connects', linkLines],
-      ["What it's costing", worstLines || 'No stage is behind its target.'],
-      ["What we'll do first", sm.actions.length ? sm.actions[0][0].name.replace(' & Booking','') + ': ' + sm.actions[0][1] : 'Keep the current approach and keep watching the weekly pace.']
+      ["What's Happening", sm.cnt.ok + ' on track, ' + sm.cnt.warn + ' need improvement, ' + sm.cnt.bad + ' need immediate attention, ' + sm.cnt.none + ' collecting data.'],
+      ['How It Connects', linkLines],
+      ["What It's Costing", worstLines || 'No stage is behind its goal.'],
+      ["What We'll Do First", sm.actions.length ? sm.actions[0][0].name.replace(' & Booking','') + ': ' + sm.actions[0][1] : 'Nothing to fix. Keep doing what is working.']
     ], 3) + '</div></details>';
   } else {
     const s = S[st.cur], c = st.cur + 1;
@@ -3079,31 +3084,37 @@ function cjDrawBar(R){
       cjHeadlineKpi(s) + cjCtl() +
       '<details class="cj-more"' + (st.openDetails ? ' open' : '') + '><summary>Details</summary><div class="cj-mgrid">' + cjCards(cjDetails(s, R), 3) + '</div></details>';
   }
-  bar.className = 'cj-bar' + (st.mode === 'sum' ? ' cj-sumbar' : '');
+  bar.className = 'cj-bar' + (st.mode !== 'run' ? ' cj-sumbar' : '');
   bar.innerHTML = h;
   const det = bar.querySelector('details.cj-more'); if(det) det.addEventListener('toggle', () => { cjState.openDetails = det.open; });
   document.getElementById('cj-next').onclick = cjNext;
   document.getElementById('cj-back').onclick = cjBack;
-  bar.querySelectorAll('.cj-step').forEach(b => b.addEventListener('click', () => { cjState.mode = 'run'; cjState.cur = +b.dataset.st; cjRender(); }));
+  bar.querySelectorAll('.cj-step').forEach(b => b.addEventListener('click', () => { cjState.mode = 'run'; cjState.cur = +b.dataset.st; cjState.seen.add(cjState.cur); cjRender(); }));
 }
 function cjDrawHead(R){
   const sm = cjSummary(R), P = R.C.P;
   const pill = (k, label, n) => '<span class="cj-stat"><i style="background:' + CJ_COL[k] + ';color:' + CJ_COL[k] + '"></i>' + label + ' <b>' + n + '</b></span>';
   document.getElementById('cj-stats').innerHTML = pill('bad', 'Immediate Attention', sm.cnt.bad) + pill('warn', 'Needs Improvement', sm.cnt.warn) + pill('ok', 'On Track', sm.cnt.ok) + pill('none', 'Collecting Data', sm.cnt.none);
-  document.getElementById('cj-sub').textContent = (cjState.mode === 'sum' ? 'Click any stage to step through it' : 'Checking stage ' + (cjState.cur + 1) + ' of 8');
+  document.getElementById('cj-sub').textContent = (cjState.mode === 'init' ? 'Click any stage or step through them one at a time' : (cjState.mode === 'sum' ? 'Summary of all 8 stages' : 'Checking stage ' + (cjState.cur + 1) + ' of 8'));
 }
 function cjRender(){
   if(!cjState.R) return;
   cjDrawMap(cjState.R); cjDrawBar(cjState.R); cjDrawHead(cjState.R);
 }
 function cjNext(){
-  if(cjState.mode === 'sum'){ cjState.mode = 'run'; cjState.cur = 0; }
-  else if(cjState.cur < 7) cjState.cur++;
-  else { cjState.mode = 'sum'; cjState.cur = -1; }
+  const st = cjState;
+  if(st.mode === 'init'){ st.mode = 'run'; st.cur = 0; st.seen.add(0); }
+  else if(st.mode === 'run'){
+    if(st.cur < 7){ st.cur++; st.seen.add(st.cur); }
+    else { st.mode = 'sum'; st.cur = -1; }
+  }
+  else { st.mode = 'init'; st.cur = -1; st.seen = new Set(); }
   cjRender();
 }
 function cjBack(){
-  if(cjState.mode === 'run'){ if(cjState.cur > 0) cjState.cur--; else { cjState.mode = 'sum'; cjState.cur = -1; } }
+  const st = cjState;
+  if(st.mode === 'run'){ if(st.cur > 0) st.cur--; else { st.mode = 'init'; st.cur = -1; st.seen = new Set(); } }
+  else if(st.mode === 'sum'){ st.mode = 'run'; st.cur = 7; st.seen.add(7); }
   cjRender();
 }
 function renderJourney(){

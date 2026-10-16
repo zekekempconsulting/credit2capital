@@ -8,7 +8,7 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/4.4.0/chart.umd.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/chartjs-plugin-datalabels/2.2.0/chartjs-plugin-datalabels.min.js"></script>
-<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Space+Grotesk:wght@400;500;600;700&family=Inter:wght@400;500;600;700&family=IBM+Plex+Mono:wght@400;500;600&family=IBM+Plex+Sans+Condensed:wght@500;600;700&family=IBM+Plex+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
 <style>
   :root{
     --royal:#244FC4;
@@ -446,6 +446,150 @@
     .data-table-wrap{ overflow-x:auto; }
     table.data-table{ min-width:640px; }
   }
+
+/* Funnel Breakdown */
+.funnel-wrap{padding:6px 22px 10px;}
+.funnel-head,.funnel-row{display:grid;grid-template-columns:200px minmax(220px,1fr) 90px 190px 190px;gap:18px;align-items:center;}
+.funnel-head{padding:14px 0;border-bottom:1px solid var(--border, rgba(16,26,61,0.08));font-size:11.5px;font-weight:600;letter-spacing:.06em;text-transform:uppercase;color:#5C6690;}
+.funnel-sub{text-transform:none;letter-spacing:0;font-weight:400;color:var(--light-muted);}
+.funnel-row{padding:15px 0;border-bottom:1px solid rgba(16,26,61,0.06);font-family:'IBM Plex Mono',monospace;font-size:13.5px;}
+.funnel-row:last-child{border-bottom:none;}
+.funnel-name{font-family:Inter,sans-serif;font-weight:600;font-size:14.5px;color:#101a3d;cursor:help;}
+.funnel-name .info{display:inline-block;margin-left:6px;width:15px;height:15px;border-radius:50%;background:rgba(36,79,196,0.1);color:#244FC4;font-size:10px;line-height:15px;text-align:center;font-weight:700;}
+.funnel-bar{display:flex;align-items:center;gap:12px;}
+.funnel-track{flex:1;height:22px;background:rgba(16,26,61,0.05);border-radius:6px;overflow:hidden;}
+.funnel-fill{height:100%;border-radius:6px;min-width:3px;transition:width .4s;}
+.funnel-count{min-width:34px;text-align:right;font-weight:600;color:#101a3d;}
+.funnel-row.total .funnel-name{color:#5C6690;cursor:default;}
+.funnel-muted{color:var(--light-muted);}
+@media (max-width:900px){.funnel-wrap{overflow-x:auto;}.funnel-head,.funnel-row{min-width:820px;}}
+
+/* ===== Customer Journey Scorecard (scoped; every class is cj- prefixed) ===== */
+#cj{
+  --glow1:rgba(36,79,196,.10); --glow2:transparent;
+  --glass:#FFFFFF; --glass2:#F7F9FF; --rim:rgba(36,79,196,.12); --rim2:rgba(36,79,196,.22); --hi:rgba(255,255,255,0);
+  --shadow:0 1px 3px rgba(16,26,61,.06),0 8px 24px -12px rgba(16,26,61,.12);
+  --ink:#101a3d; --muted:#5C6690; --faint:#A3ACCB;
+  --brand:#244FC4; --brand-2:#1E43A8; --brand-3:#152F7A; --brand-soft:rgba(36,79,196,.10);
+  --ok:#1C8A55; --warn:#C27A06; --bad:#C93A2B; --none:#8A93B4;
+  --ok-soft:rgba(28,138,85,.10); --warn-soft:rgba(245,185,27,.16); --bad-soft:rgba(201,58,43,.10); --none-soft:rgba(138,147,180,.14);
+  --core:#FFFFFF; --track:#DDE3F4; --track-hi:#DDE3F4; --box:#FFFFFF; --boxline:rgba(36,79,196,.14);
+  --zone-a:rgba(245,185,27,.10); --zone-b:rgba(245,185,27,.02);
+  --dots:rgba(36,79,196,.07);
+  --f-display:"Space Grotesk","Inter",Arial,sans-serif;
+  --f-body:"Inter",-apple-system,"Segoe UI",Roboto,sans-serif;
+  --f-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+  position:relative;padding:0;color:var(--ink);font-family:var(--f-body);font-size:14px;line-height:1.5;
+  -webkit-font-smoothing:antialiased;color-scheme:light;margin-bottom:24px;
+}
+#cj *{box-sizing:border-box}
+#cj button{font:inherit;color:inherit;cursor:pointer}
+#cj :focus-visible{outline:2px solid var(--brand);outline-offset:2px}
+#cj .cj-label{font-family:var(--f-mono);font-size:10.5px;letter-spacing:.16em;text-transform:uppercase;color:var(--muted)}
+#cj .cj-glass{background:var(--glass);border:1px solid var(--rim);box-shadow:var(--shadow)}
+#cj .cj-canvas{position:relative;border-radius:16px;overflow:hidden}
+#cj .cj-canvas::before{content:"";position:absolute;inset:0;background-image:radial-gradient(var(--dots) 1px,transparent 1.2px);background-size:20px 20px;pointer-events:none;-webkit-mask-image:radial-gradient(ellipse 80% 70% at 50% 30%,#000 30%,transparent 80%);mask-image:radial-gradient(ellipse 80% 70% at 50% 30%,#000 30%,transparent 80%)}
+#cj .cj-head{position:relative;z-index:1;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:12px 16px;padding:22px 26px 0}
+#cj .cj-head h1{margin:0;font-family:var(--f-display);font-weight:700;font-size:28px;letter-spacing:-.005em;line-height:1.1;color:var(--ink)}
+#cj .cj-sub{color:var(--muted);font-size:13.5px;margin-top:3px}
+#cj .cj-status{display:flex;flex-wrap:wrap;gap:6px}
+#cj .cj-stat{display:inline-flex;align-items:center;gap:8px;padding:6px 11px;border-radius:999px;border:1px solid var(--rim);font-size:12.5px;color:var(--muted);background:var(--glass2);box-shadow:inset 0 1px 0 var(--hi)}
+#cj .cj-stat i{width:8px;height:8px;border-radius:50%;box-shadow:0 0 10px currentColor}
+#cj .cj-stat b{color:var(--ink);font-family:var(--f-mono);font-weight:600}
+#cj .cj-legend{position:relative;z-index:1;display:flex;flex-wrap:wrap;gap:6px 18px;padding:12px 26px 0;font-size:12px;color:var(--muted)}
+#cj .cj-legend span{display:inline-flex;align-items:center;gap:7px}
+#cj .cj-legend i{width:8px;height:8px;border-radius:50%}
+#cj .cj-legend b{font-weight:600;color:var(--ink)}
+#cj .cj-mapwrap{position:relative;z-index:1;overflow-x:auto;padding:10px 16px 16px}
+#cj #cj-map{display:block;width:100%;min-width:960px;height:auto;overflow:visible}
+
+/* SVG motion */
+#cj .cj-halo{transform-box:fill-box;transform-origin:center;animation:cj-halo2 2.6s ease-in-out infinite}
+@keyframes cj-halo2{0%,100%{opacity:.45;transform:scale(1)}60%{opacity:0;transform:scale(1.32)}}
+#cj .cj-active{transform-box:fill-box;transform-origin:center;animation:cj-spin 16s linear infinite}
+@keyframes cj-spin{to{transform:rotate(360deg)}}
+#cj .cj-flow{animation:cj-flow 1.6s linear infinite}
+@keyframes cj-flow{to{stroke-dashoffset:-32}}
+#cj .cj-pop{animation:cj-pop .55s cubic-bezier(.2,.8,.2,1) both}
+@keyframes cj-pop{from{opacity:0;transform:translateY(8px)}to{opacity:1;transform:none}}
+#cj .cj-zone-in{animation:cj-fade .8s ease both}
+@keyframes cj-fade{from{opacity:0}to{opacity:1}}
+#cj .cj-node{cursor:pointer}
+#cj .cj-node:hover .cj-core{stroke:var(--brand)}
+
+/* Insight bar */
+#cj .cj-bar{position:relative;z-index:1;display:grid;grid-template-columns:minmax(300px,1.1fr) minmax(0,1.45fr) minmax(230px,1fr) auto;align-items:stretch;border-top:1px solid var(--rim);background:linear-gradient(180deg,var(--glass2),var(--glass))}
+#cj .cj-bar>div{padding:16px 22px;min-width:0}
+#cj .cj-bar>div+div{border-left:1px solid var(--rim)}
+#cj .cj-bar.cj-sumbar{grid-template-columns:minmax(300px,.9fr) minmax(0,2.2fr) minmax(210px,.8fr) auto}
+#cj .cj-who{display:flex;gap:14px;align-items:center;flex-wrap:wrap}
+#cj .cj-who>div:last-child{min-width:0}
+#cj .cj-num{font-family:var(--f-display);font-weight:700;font-size:44px;line-height:.9;letter-spacing:-.02em;color:var(--brand);font-variant-numeric:tabular-nums}
+#cj .cj-who h2{margin:2px 0 0;font-family:var(--f-display);font-weight:600;font-size:21px;line-height:1.12;color:var(--ink)}
+#cj .cj-chip{white-space:normal;max-width:100%;display:inline-flex;align-items:center;gap:7px;margin-top:7px;padding:3px 10px;border-radius:999px;font-size:11.5px;font-weight:600;border:1px solid currentColor;border-color:color-mix(in srgb,currentColor 30%,transparent)}
+#cj .cj-chip i{width:6px;height:6px;border-radius:50%;background:currentColor;box-shadow:0 0 8px currentColor}
+#cj .cj-c-ok{color:var(--ok);background:var(--ok-soft)}#cj .cj-c-warn{color:var(--warn);background:var(--warn-soft)}#cj .cj-c-bad{color:var(--bad);background:var(--bad-soft)}#cj .cj-c-none{color:var(--muted);background:var(--none-soft)}
+#cj .cj-ahead{display:inline-block;margin-left:6px;padding:1px 7px;border-radius:999px;font-size:10px;font-weight:700;letter-spacing:.06em;text-transform:uppercase;color:var(--ok);background:var(--ok-soft);vertical-align:middle}
+#cj .cj-say{display:flex;flex-direction:column;justify-content:center;gap:8px}
+#cj .cj-say p{margin:0;font-size:15.5px;line-height:1.5;font-weight:500;color:var(--ink)}
+#cj .cj-sig{display:flex;gap:9px;align-items:center;font-size:12.5px;color:var(--bad);font-weight:500}
+#cj .cj-sig i{flex:none;width:7px;height:7px;border-radius:50%;background:var(--bad);box-shadow:0 0 8px var(--bad);animation:cj-blink 2.6s ease-in-out infinite}
+@keyframes cj-blink{50%{opacity:.45}}
+#cj .cj-kpi{display:flex;flex-direction:column;justify-content:center;gap:4px}
+#cj .cj-kpi .cj-row{display:flex;align-items:baseline;gap:12px;flex-wrap:wrap}
+#cj .cj-kpi .cj-b{font-family:var(--f-display);font-weight:600;font-size:22px;color:var(--muted);font-variant-numeric:tabular-nums}
+#cj .cj-kpi .cj-a{font-family:var(--f-display);font-weight:700;font-size:34px;line-height:1;letter-spacing:-.01em;font-variant-numeric:tabular-nums}
+#cj .cj-kpi .cj-ar{color:var(--faint);font-size:16px}
+#cj .cj-kpi .cj-k{font-size:12px;color:var(--muted)}
+#cj .cj-ctl{display:flex;flex-direction:column;justify-content:center;gap:10px;align-items:flex-end}
+#cj .cj-btns{display:flex;gap:7px}
+#cj .cj-btn{border:1px solid var(--rim2);background:var(--glass2);color:var(--ink);padding:9px 15px;border-radius:9px;font-weight:600;font-size:13px;box-shadow:inset 0 1px 0 var(--hi);transition:transform .15s,box-shadow .2s}
+#cj .cj-btn:hover:not(:disabled){transform:translateY(-1px)}
+#cj .cj-btn.cj-primary{background:var(--brand);border-color:transparent;color:#fff;min-width:128px;box-shadow:0 8px 18px -10px var(--brand-2)}
+#cj .cj-btn:disabled{opacity:.35;cursor:default}
+#cj .cj-prog{display:flex;gap:4px;align-items:center}
+#cj .cj-prog i{width:16px;height:3px;border-radius:2px;background:var(--track-hi);transition:background .3s,box-shadow .3s}
+#cj .cj-prog i.cj-on{background:var(--brand);box-shadow:0 0 8px var(--brand)}
+#cj .cj-prog span{margin-left:7px;font-family:var(--f-mono);font-size:11px;color:var(--muted)}
+#cj details.cj-more{grid-column:1/-1;border-top:1px solid var(--rim);padding:0 22px;background:var(--glass)}
+#cj details.cj-more summary{cursor:pointer;list-style:none;padding:11px 0;font-size:12.5px;font-weight:600;color:var(--brand);display:flex;gap:8px;align-items:center;letter-spacing:.02em}
+#cj details.cj-more summary::-webkit-details-marker{display:none}
+#cj details.cj-more summary::after{content:"";width:7px;height:7px;border-right:1.5px solid currentColor;border-bottom:1.5px solid currentColor;transform:rotate(45deg) translateY(-2px);transition:transform .2s}
+#cj details.cj-more[open] summary::after{transform:rotate(-135deg) translateY(-2px)}
+#cj .cj-mgrid{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:12px;padding:2px 0 18px}
+#cj .cj-mcard{padding:14px 16px;border-radius:12px;background:var(--glass2);border:1px solid var(--rim);box-shadow:inset 0 1px 0 var(--hi)}
+#cj .cj-mcard .cj-label{display:flex;align-items:center;gap:8px;margin-bottom:6px}
+#cj .cj-mcard .cj-label i{width:6px;height:6px;border-radius:50%;background:var(--brand)}
+#cj .cj-mcard p{margin:0;font-size:13.5px;line-height:1.55;color:var(--ink)}
+#cj .cj-mcard.cj-act{background:linear-gradient(180deg,var(--ok-soft),transparent),var(--glass2);border-color:color-mix(in srgb,var(--ok) 30%,transparent)}
+#cj .cj-mcard.cj-act .cj-label i{background:var(--ok)}
+#cj .cj-sum{display:grid;gap:8px}
+#cj .cj-row2{display:flex;flex-wrap:wrap;gap:3px;align-items:center}
+#cj .cj-tagk{font-family:var(--f-mono);font-size:9.5px;letter-spacing:.14em;color:var(--muted);flex-basis:100%;margin-bottom:-1px}
+#cj .cj-step{padding:4px 7px;border-radius:6px;background:var(--bad-soft);border:1px solid color-mix(in srgb,var(--bad) 25%,transparent);font-size:11.5px;font-weight:600;white-space:nowrap;cursor:pointer;color:var(--ink);transition:transform .15s}
+#cj .cj-step:hover{transform:translateY(-1px)}
+#cj .cj-step.cj-s-warn{background:var(--warn-soft);border-color:color-mix(in srgb,var(--warn) 30%,transparent)}
+#cj .cj-step.cj-s-ok{background:var(--ok-soft);border-color:color-mix(in srgb,var(--ok) 30%,transparent)}
+#cj .cj-to{color:var(--bad);font-family:var(--f-mono);font-size:12px}
+#cj .cj-pri{display:grid;gap:6px;font-size:13px;color:var(--ink)}
+#cj .cj-pri div{display:flex;gap:10px;align-items:baseline}
+#cj .cj-pri b{font-family:var(--f-display);color:var(--brand);font-size:17px}
+#cj .cj-txt{font-family:var(--f-display);font-weight:600;font-size:17px;line-height:1.25}
+
+@media (prefers-reduced-motion: reduce){#cj *,#cj *::before,#cj *::after{animation:none!important;transition:none!important}}
+@media (max-width:980px){
+  #cj .cj-bar,#cj .cj-bar.cj-sumbar{grid-template-columns:1fr 1fr}
+  #cj .cj-bar>div+div{border-left:0}
+  #cj .cj-bar>div{border-top:1px solid var(--rim)}
+  #cj .cj-ctl{align-items:flex-start}
+  #cj .cj-mgrid{grid-template-columns:1fr 1fr}
+}
+@media (max-width:560px){
+  #cj{padding:8px}
+  #cj .cj-bar,#cj .cj-bar.cj-sumbar,#cj .cj-mgrid{grid-template-columns:1fr}
+  #cj .cj-head{padding:18px 16px 0}
+  #cj .cj-legend{padding:12px 16px 0}
+}
 </style>
 </head>
 <body>
@@ -697,25 +841,27 @@
           </div>
         </div>
       </div>
-      <div class="section-label">Lead Stage Breakdown <span style="text-transform:none;letter-spacing:0;color:var(--light-muted);font-weight:400;">&mdash; where every Meta lead is in the pipeline right now</span></div>
-      <div class="data-table-wrap">
-        <table class="data-table">
-          <thead>
-            <tr><th>Stage</th><th>GHL stages included</th><th>Leads</th><th>% of leads</th><th>Avg days in stage (leads here now)</th><th>Avg days before moving on</th></tr>
-          </thead>
-          <tbody id="meta-stage-body"></tbody>
-        </table>
+      <div class="section-label">Customer Journey Scorecard <span style="text-transform:none;letter-spacing:0;color:var(--light-muted);font-weight:400;">&mdash; how each stage of the customer journey is performing</span></div>
+      <div id="cj">
+        <div class="cj-canvas cj-glass">
+          <div class="cj-head">
+            <div>
+              <div class="cj-sub" id="cj-sub">Click any stage to step through it</div>
+            </div>
+            <div class="cj-status" id="cj-stats"></div>
+          </div>
+          <div class="cj-mapwrap"><svg id="cj-map" viewBox="0 0 1160 360" role="img" aria-label="Customer journey scorecard"></svg></div>
+          <div class="cj-bar" id="cj-bar"></div>
+        </div>
       </div>
-      <div class="funnel-definitions" id="meta-close-time" style="margin-top:12px;"></div>
-      <div class="section-label" style="margin-top:34px;">Leads By Week <span style="text-transform:none;letter-spacing:0;color:var(--light-muted);font-weight:400;">&mdash; Sunday to Saturday, grouped by the week the lead came in, showing where they are now</span></div>
-      <div class="data-table-wrap">
-        <table class="data-table">
-          <thead>
-            <tr><th>Week</th><th>Leads</th><th>Warm</th><th>Cold</th><th>In follow-up</th><th>Appointment process</th><th>Closed won</th><th>Other</th><th>Still working</th></tr>
-          </thead>
-          <tbody id="meta-stage-week-body"></tbody>
-        </table>
+      <div class="section-label">Pipeline Breakdown <span style="text-transform:none;letter-spacing:0;color:var(--light-muted);font-weight:400;">&mdash; where every Meta lead is in the pipeline</span></div>
+      <div class="data-table-wrap funnel-wrap">
+        <div class="funnel-head">
+          <div>Stage</div><div>Leads</div><div>% of leads</div><div>Avg days in stage <span class="funnel-sub">(leads here now)</span></div><div>Avg days before moving on</div>
+        </div>
+        <div id="meta-funnel"></div>
       </div>
+      <div class="funnel-definitions" id="meta-close-time" style="margin:12px 0 26px;"></div>
       <div class="section-label">Lead Breakdown <span style="text-transform:none;letter-spacing:0;color:var(--light-muted);font-weight:400;">— Contact Source contains "Meta Ads", one row per contact</span></div>
       <div class="data-table-wrap">
         <table class="data-table">
@@ -1027,6 +1173,7 @@ function normalizeStage(raw){
   if(clean.includes('no show')) return 'No Show';
   if(clean.includes('reschedul')) return 'Rescheduled';
   if(clean.includes('follow up')) return 'In Follow-Up';
+  if(clean.includes('funded') && !clean.includes('unfunded')) return 'Funded';
   if(clean.includes('closed')) return 'Closed Won';
   return raw || 'Unmapped';
 }
@@ -1413,6 +1560,7 @@ function applyFilterAndRenderAll(){
   renderOverview(ghlRows, ghlSummary, metaSummary, skoolSummary);
   renderClarity(clarityOverviewRows, clarityBreakdownRows);
   renderProfitability(ghlRows, ghlSummary, metaSummary, skoolSummary);
+  try{ renderJourney(); }catch(e){ console.error(e); }
 }
 
 /* ---------- GHL tab ---------- */
@@ -1641,6 +1789,7 @@ function renderMetaLeadsChart(){
     options: {
       responsive: true,
       maintainAspectRatio: false,
+      layout: { padding: { top: 6 } },
       interaction: { mode: 'index', intersect: false },
       onHover: (event, elements, chart) => {
         const newIdx = elements.length ? elements[0].index : null;
@@ -1650,7 +1799,7 @@ function renderMetaLeadsChart(){
         }
       },
       plugins: {
-        legend: { display: true, position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 8, font: { family: 'Inter', size: 12.5 }, color: '#5C6690' } },
+        legend: { display: true, position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 8, padding: 18, font: { family: 'Inter', size: 12.5 }, color: '#5C6690' } },
         tooltip: { backgroundColor: '#101a3d', padding: 10, titleFont: {family:'Inter'}, bodyFont: {family:'Inter'} },
         datalabels: {
           align: 'top', anchor: 'end', offset: 4,
@@ -1662,7 +1811,7 @@ function renderMetaLeadsChart(){
       },
       scales: {
         x: { grid: { display: false }, ticks: { font: { family: 'Inter', size: 11.5 }, color: '#5C6690' } },
-        y: { beginAtZero: true, ticks: { precision: 0, font: { family: 'IBM Plex Mono', size: 11 }, color: '#5C6690' }, grid: { color: 'rgba(16,26,61,0.07)' } }
+        y: { beginAtZero: true, grace: '22%', ticks: { precision: 0, font: { family: 'IBM Plex Mono', size: 11 }, color: '#5C6690' }, grid: { color: 'rgba(16,26,61,0.07)' } }
       }
     }
   });
@@ -1778,16 +1927,16 @@ function renderMetaAds(rows, ghlRows){
 }
 
 
-/* ---------- Lead Stage Breakdown (Meta Ads tab) ---------- */
-/* Groups GHL pipeline stages into the buckets Zeke tracks. Edit here if the
-   pipeline stages change. "Still working" = Warm + In follow-up + Appointment
-   process (leads that are neither closed nor cold). */
+/* ---------- Funnel Breakdown (Meta Ads tab) ---------- */
+/* Groups GHL pipeline stages into the funnel stages Zeke tracks. Edit here if the
+   pipeline stages change. `label` is the display name, `note` is the GHL stage
+   name shown in the hover tooltip. */
 const STAGE_GROUPS = [
-  { key:'warm',     label:'Warm',                stages:['Qualified Lead'],                              note:'Hot lead' },
-  { key:'cold',     label:'Cold',                stages:['Unqualified / Nurture'],                       note:'Cold lead / nurture' },
-  { key:'followup', label:'In follow-up',        stages:['In Follow-Up'],                                note:'Follow up' },
-  { key:'appt',     label:'Appointment process', stages:['Meeting Booked','Rescheduled','No Show'],      note:'Meeting booked, rescheduled, no show' },
-  { key:'won',      label:'Closed won',          stages:['Closed Won'],                                  note:'Closed' }
+  { key:'warm',     label:'Warm Lead',            stages:['Qualified Lead'],                              note:'GHL: Hot lead',                                 color:'#F5B91B' },
+  { key:'cold',     label:'Cold Lead / Nurture',  stages:['Unqualified / Nurture'],                       note:'GHL: Cold lead / nurture',                      color:'#8FA3D9' },
+  { key:'followup', label:'Active Follow-Up',     stages:['In Follow-Up'],                                note:'GHL: Follow up',                                color:'#5C7BD6' },
+  { key:'appt',     label:'Appointment Stage',    stages:['Meeting Booked','Rescheduled','No Show'],      note:'GHL: Meeting booked, rescheduled, no show',     color:'#244FC4' },
+  { key:'won',      label:'Enrolled Client',      stages:['Closed Won','Funded'],                         note:'GHL: Closed, Funded',                                   color:'#1E9E6A' }
 ];
 function stageGroupKey(stage){
   for(const g of STAGE_GROUPS){ if(g.stages.includes(stage)) return g.key; }
@@ -1825,79 +1974,65 @@ function fmtDays(list){
 }
 function renderMetaStageBreakdown(uniqueMetaLeads){
   const now = new Date();
-  /* Part 1: counts by stage group, for whatever the main date filter shows. */
-  const body = document.getElementById('meta-stage-body');
-  if(body){
-    const counts = {}, hereNow = {}, moved = {};
-    STAGE_GROUPS.forEach(g=>{ counts[g.key]=0; hereNow[g.key]=[]; moved[g.key]=[]; });
-    counts.other = 0; hereNow.other = []; moved.other = [];
+  const host = document.getElementById('meta-funnel');
+  if(!host) return;
+  const counts = {}, hereNow = {}, moved = {};
+  STAGE_GROUPS.forEach(g=>{ counts[g.key]=0; hereNow[g.key]=[]; moved[g.key]=[]; });
+  counts.other = 0; hereNow.other = []; moved.other = [];
 
-    uniqueMetaLeads.forEach(r=>{
-      const k = stageGroupKey(leadStage(r));
-      counts[k]++;
-      const at = enteredCurrentStageAt(r);
-      if(at) hereNow[k].push(Math.max(0,(now-at)/DAY_MS));
-    });
+  uniqueMetaLeads.forEach(r=>{
+    const k = stageGroupKey(leadStage(r));
+    counts[k]++;
+    const at = enteredCurrentStageAt(r);
+    if(at) hereNow[k].push(Math.max(0,(now-at)/DAY_MS));
+  });
 
-    /* Finished stays (the lead moved on) come from ALL Meta leads, not just the filtered ones. */
-    dedupeContactsMostRecent(GHL_ROWS.filter(isMetaSourced)).forEach(r=>{
-      const path = parseStagePath(r);
-      for(let i=0;i<path.length-1;i++){
-        if(path[i].at && path[i+1].at){
-          moved[stageGroupKey(path[i].stage)].push(Math.max(0,(path[i+1].at-path[i].at)/DAY_MS));
-        }
+  /* Finished stays (the lead moved on) come from ALL Meta leads, not just the filtered ones. */
+  const allMeta = dedupeContactsMostRecent(GHL_ROWS.filter(isMetaSourced));
+  allMeta.forEach(r=>{
+    const path = parseStagePath(r);
+    for(let i=0;i<path.length-1;i++){
+      if(path[i].at && path[i+1].at){
+        moved[stageGroupKey(path[i].stage)].push(Math.max(0,(path[i+1].at-path[i].at)/DAY_MS));
       }
-    });
-
-    const total = uniqueMetaLeads.length;
-    const pct = n => total ? Math.round(n/total*100) + '%' : '0%';
-    const row = (label, note, k) => `<tr><td class="name-cell">${label}</td><td>${note}</td><td>${counts[k]}</td><td>${pct(counts[k])}</td><td>${counts[k] ? fmtDays(hereNow[k]) : 'No leads here'}</td><td>${fmtDays(moved[k])}</td></tr>`;
-    let html = STAGE_GROUPS.map(g=>row(g.label, g.note, g.key)).join('');
-    if(counts.other) html += row('Other / unmapped', 'Stage name not in the groups above', 'other');
-    body.innerHTML = total ? html : '<tr><td colspan="6" style="text-align:center;color:var(--light-muted);font-family:Inter,sans-serif;">No Meta leads in this date range.</td></tr>';
-
-    /* Time to Closed Won: lead created -> entered Closed Won. */
-    const closeEl = document.getElementById('meta-close-time');
-    if(closeEl){
-      const spans = [];
-      dedupeContactsMostRecent(GHL_ROWS.filter(isMetaSourced)).forEach(r=>{
-        if(leadStage(r) !== 'Closed Won') return;
-        const at = enteredCurrentStageAt(r);
-        const created = r['Created At'] ? new Date(r['Created At']) : null;
-        if(at && created && !isNaN(created) && at >= created) spans.push((at-created)/DAY_MS);
-      });
-      closeEl.innerHTML = spans.length
-        ? '<strong>Time to Closed Won:</strong> ' + (spans.reduce((a,b)=>a+b,0)/spans.length).toFixed(1) + ' days on average from lead to Closed Won (' + spans.length + ' client' + (spans.length===1?'':'s') + ').'
-        : '<strong>Time to Closed Won:</strong> collecting data. This fills in as stage-change dates sync from GHL.';
     }
+  });
+
+  const total = uniqueMetaLeads.length;
+  if(!total){
+    host.innerHTML = '<div style="padding:26px 0;text-align:center;color:var(--light-muted);">No Meta leads in this date range.</div>';
+  } else {
+    const maxCount = Math.max(1, ...STAGE_GROUPS.map(g=>counts[g.key]), counts.other);
+    const pct = n => Math.round(n/total*100) + '%';
+    const days = list => list.length ? (list.reduce((a,b)=>a+b,0)/list.length).toFixed(1) + ' days <span class="funnel-muted">(' + list.length + ')</span>' : '<span class="funnel-muted">Collecting data</span>';
+    const row = (label, tip, n, color, cls, here, mv) => `
+      <div class="funnel-row ${cls||''}">
+        <div class="funnel-name" ${tip?`title="${tip}"`:''}>${label}${tip?'<span class="info">i</span>':''}</div>
+        <div class="funnel-bar"><div class="funnel-track"><div class="funnel-fill" style="width:${cls==='total'?100:Math.max(n/maxCount*100,n?2:0)}%;background:${color};"></div></div><div class="funnel-count">${n}</div></div>
+        <div>${pct(n)}</div>
+        <div>${here}</div>
+        <div>${mv}</div>
+      </div>`;
+    let html = row('Total Leads', '', total, 'rgba(16,26,61,0.18)', 'total', '<span class="funnel-muted">All stages</span>', '<span class="funnel-muted">All stages</span>');
+    html += STAGE_GROUPS.map(g=>row(g.label, g.note, counts[g.key], g.color, '', counts[g.key] ? days(hereNow[g.key]) : '<span class="funnel-muted">No leads here</span>', days(moved[g.key]))).join('');
+    if(counts.other) html += row('Other', 'Stage name not in the groups above', counts.other, '#B8BED6', '', counts.other ? days(hereNow.other) : '', days(moved.other));
+    host.innerHTML = html;
   }
 
-  /* Part 2: week-by-week cohorts. Ignores the main date filter on purpose, so
-     last week's leads stay visible while you look at this week. */
-  const wbody = document.getElementById('meta-stage-week-body');
-  if(!wbody) return;
-  const all = dedupeContactsMostRecent(GHL_ROWS.filter(isMetaSourced));
-  const weeks = {};
-  all.forEach(r=>{
-    if(!r['Created At']) return;
-    const d = parseDateSafe(r['Created At']);
-    if(isNaN(d)) return;
-    const ws = weekStartSunday(d);
-    const key = ws.getTime();
-    if(!weeks[key]) weeks[key] = { start: ws, total:0, warm:0, cold:0, followup:0, appt:0, won:0, other:0 };
-    weeks[key].total++;
-    weeks[key][stageGroupKey(leadStage(r))]++;
-  });
-  const keys = Object.keys(weeks).map(Number).sort((a,b)=>b-a).slice(0, 8);
-  const thisWeek = weekStartSunday(new Date()).getTime();
-  const fmt = d => d.toLocaleDateString(undefined,{month:'short', day:'numeric'});
-  wbody.innerHTML = keys.length ? keys.map(k=>{
-    const w = weeks[k];
-    const end = new Date(w.start); end.setDate(end.getDate()+6);
-    const label = fmt(w.start) + ' \u2013 ' + fmt(end) + (k === thisWeek ? ' (this week)' : '');
-    const working = w.warm + w.followup + w.appt;
-    return `<tr><td class="name-cell">${label}</td><td>${w.total}</td><td>${w.warm}</td><td>${w.cold}</td><td>${w.followup}</td><td>${w.appt}</td><td>${w.won}</td><td>${w.other}</td><td>${working}</td></tr>`;
-  }).join('') : '<tr><td colspan="9" style="text-align:center;color:var(--light-muted);font-family:Inter,sans-serif;">No Meta leads yet.</td></tr>';
+  /* Time to Enrolled Client: lead created -> entered Closed Won. */
+  const closeEl = document.getElementById('meta-close-time');
+  if(closeEl){
+    const spans = [];
+    allMeta.forEach(r=>{
+      if(leadStage(r) !== 'Closed Won') return;
+      const at = enteredCurrentStageAt(r);
+      const created = r['Created At'] ? new Date(r['Created At']) : null;
+      if(at && created && !isNaN(created) && at >= created) spans.push((at-created)/DAY_MS);
+    });
+    closeEl.innerHTML = spans.length
+      ? '<strong>Time to Enrolled Client:</strong> ' + (spans.reduce((a,b)=>a+b,0)/spans.length).toFixed(1) + ' days on average from lead to enrolled (' + spans.length + ' client' + (spans.length===1?'':'s') + ').'
+      : '<strong>Time to Enrolled Client:</strong> collecting data. This fills in as stage-change dates sync from GHL.';
+  }
 }
 
 /* ---------- Skool tab ---------- */
@@ -2351,6 +2486,649 @@ function renderOverview(ghlRows, ghlSummary, metaSummary, skoolSummary){
       </div>
     </div>`;
 }
+
+
+
+/* ============================================================
+   CUSTOMER JOURNEY SCORECARD
+   Rule-based and live. Every box color comes from the same data the rest
+   of the dashboard uses, scored against a target. Nothing here is typed in
+   by hand except the starting benchmarks in CJ_SEED, which are used only
+   until there is enough earlier data to calculate a rolling target.
+   Rules (approved Oct 16, 2026):
+     higher-is-better  green >= 90% of target, orange 65-90%, red < 65%
+     lower-is-better   green <= +10% (cost checks +15%), orange to +25%, red beyond
+     pace checks       actual vs where it should be by now (target scaled to the date filter)
+     gray              not enough data yet; the real number still shows
+     box color         the worst scored check in the box
+   ============================================================ */
+const CJ_DAY = 86400000;
+const CJ_FUNDING_GREEN_DAYS = 60, CJ_FUNDING_ORANGE_DAYS = 90;
+const CJ_SEED = {
+  leadsPerWeek: 17.25, offerPer1k: 6.2, qualified: 0.344, cpl: 13.32, lpConvClicks: 0.16,
+  replyBooked: 0.595, followupDays: 12.2, apptToClient: 0.15, newClientsPerMonth: 3, cpa: 412.77
+};
+const CJ_PHASES = [[0,1,'ATTRACT'],[2,4,'CONVERT'],[5,7,'DELIVER & KEEP']];
+const CJ_LINKS = [
+  [1,2,'A weaker offer means fewer people respond to the ads.'],
+  [2,3,'Fewer or lower-quality leads give the AI less to work with.'],
+  [3,4,'Fewer booked appointments means fewer for the team to manage.'],
+  [4,5,'No-shows and stalled follow-ups are lost sales conversations.'],
+  [2,5,'Lower-quality leads lower the close rate.'],
+  [5,6,'Fewer closed sales means fewer new clients.'],
+  [6,7,'Fewer new clients means fewer to onboard.'],
+  [7,8,'Clients who do not join do not reach funding.']
+];
+const CJ_STAGE_META = [
+  { n:1, name:'Offer', lc:'C2C Funding Program', checks:['offer'],
+    why:'The offer is why a stranger stops and raises a hand. When fewer people respond per 1,000 who see it, every stage after it starts with less.' },
+  { n:2, name:'Marketing', lc:'Meta Ads · Landing Page', checks:['leadsPace','qualified','cpl','lpconv'],
+    why:'Marketing fills the pipeline. Lead volume, lead quality and cost decide how much the rest of the system has to work with.' },
+  { n:3, name:'AI Intake', lc:'AI John', checks:['replyBooked','replyRate'],
+    why:'The AI is the first reply and the booking. A lead that replies and does not book is a lead the system had and lost.' },
+  { n:4, name:'Customer Service & Booking', lc:'After the Booking', checks:['stuck','followupDays'],
+    why:'Once an appointment is booked, people carry it. No-shows, reschedules and stalled follow-ups turn booked appointments into nothing.' },
+  { n:5, name:'Sales', lc:'Jay and the Team', checks:['apptToClient'],
+    why:'Appointments only pay when they become clients. This is where ad spend turns into revenue.' },
+  { n:6, name:'Acquisition', lc:'New Clients', checks:['newClients','cpa'],
+    why:'New clients are the result everything else exists to produce, and cost per client is what makes the ads profitable.' },
+  { n:7, name:'Onboarding', lc:'Joining the Community', checks:['salesReadyJoined'],
+    why:'A client who does not join cannot be funded. Onboarding turns a purchase into a client.' },
+  { n:8, name:'Funding', lc:'Business Funding', checks:['funding'],
+    why:'Funding is the outcome the client paid for and where Jay earns his revenue. Clients waiting past the window are the ones that stop referring.' }
+];
+
+/* ---------- formatting ---------- */
+function cjFmt(v, unit){
+  if(v === null || v === undefined || isNaN(v)) return '';
+  switch(unit){
+    case 'pct': return (v < 0.1 ? (v*100).toFixed(1) : Math.round(v*100)) + '%';
+    case 'usd2': return '$' + v.toFixed(2);
+    case 'usd0': return '$' + Math.round(v).toLocaleString();
+    case 'days': return v.toFixed(1) + ' days';
+    case 'x': return v.toFixed(2);
+    case 'n1': return v.toFixed(1);
+    case 'hrs': return v < 1 ? Math.round(v*60) + ' min' : v.toFixed(1) + ' hrs';
+    default: return Math.round(v).toLocaleString();
+  }
+}
+function cjEsc(t){ return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;'); }
+
+/* ---------- lead model ---------- */
+function cjLead(r){
+  const created = r['Created At'] ? new Date(r['Created At']) : null;
+  const stage = r['Normalized Stage'] || normalizeStage(r['Raw Stage']);
+  const tags = ((r['Tags'] || r['Tag'] || '') + '').toLowerCase();
+  const path = parseStagePath(r);
+  const everIn = s => stage === s || path.some(p => p.stage === s);
+  const replied = tags.includes('replied to followup');
+  const bookedTag = tags.includes('appntbooked');
+  const isClient = stage === 'Closed Won' || stage === 'Funded';
+  const booked = bookedTag || isClient || ['Meeting Booked','Rescheduled','No Show'].includes(stage) || path.some(p => ['Meeting Booked','Rescheduled','No Show','Closed Won'].includes(p.stage));
+  const cls = getEffectiveFunnelClassification(r);
+  const entered = enteredCurrentStageAt(r);
+  const enteredStage = s => { const p = path.find(x => x.stage === s && x.at); return p ? p.at : null; };
+  const noShowEver = everIn('No Show'), reschedEver = everIn('Rescheduled');
+  let noShowAfterResched = false;
+  if(reschedEver){
+    const i = path.findIndex(p => p.stage === 'Rescheduled');
+    noShowAfterResched = stage === 'No Show' || (i >= 0 && path.slice(i + 1).some(p => p.stage === 'No Show'));
+  }
+  return {
+    r, created, stage, tags, path, replied, bookedTag, booked, isClient,
+    isFunded: stage === 'Funded',
+    qualified: ['Qualified Lead','Sales-Ready Opportunity','Client'].includes(cls),
+    salesReady: ['Sales-Ready Opportunity','Client'].includes(cls),
+    entered, noShowEver, reschedEver, noShowAfterResched,
+    enrollAt: isClient ? (enteredStage('Closed Won') || (stage === 'Closed Won' ? entered : null) || created) : null,
+    fundedAt: stage === 'Funded' ? (enteredStage('Funded') || entered) : null
+  };
+}
+
+/* ---------- period and context ---------- */
+function cjPeriod(now, dataStart){
+  const sod = new Date(now.getFullYear(), now.getMonth(), now.getDate());
+  const labels = { all:'All time', today:'Today', '7d':'Last 7 days', '30d':'Last 30 days', mtd:'This month', ytd:'Year to date', qtd:'This quarter', custom:'Custom range' };
+  let start, end = now, total = null;
+  if(currentRange === 'all'){ start = dataStart; }
+  else if(currentRange === 'custom'){
+    const s = document.getElementById('date-start').value, e = document.getElementById('date-end').value;
+    start = s ? new Date(s) : dataStart;
+    const eEnd = e ? new Date(new Date(e).getTime() + 86399000) : now;
+    total = Math.max(1, (eEnd - start) / CJ_DAY);
+    end = eEnd < now ? eEnd : now;
+  } else {
+    const b = getRangeBounds(currentRange); start = b[0]; end = b[1];
+    if(currentRange === 'today') total = 1;
+    else if(currentRange === 'mtd') total = new Date(now.getFullYear(), now.getMonth() + 1, 0).getDate();
+    else if(currentRange === 'qtd'){ const q = Math.floor(now.getMonth() / 3) * 3; total = (new Date(now.getFullYear(), q + 3, 1) - new Date(now.getFullYear(), q, 1)) / CJ_DAY; }
+    else if(currentRange === 'ytd') total = ((now.getFullYear() % 4 === 0) ? 366 : 365);
+    else total = null;
+  }
+  if(!start || isNaN(start)) start = dataStart || sod;
+  const elapsed = Math.max(0.01, (end - start) / CJ_DAY);
+  return { start, end, label: labels[currentRange] || 'Selected range', total, elapsed, key: currentRange };
+}
+function cjBuildContext(now){
+  now = now || new Date();
+  const leads = dedupeContactsMostRecent(GHL_ROWS.filter(isMetaSourced)).map(cjLead).filter(l => l.created && !isNaN(l.created));
+  const meta = META_ROWS.map(r => ({
+    d: parseDateSafe(r.Date), spend: parseFloat(r.Spend) || 0, imp: parseFloat(r.Impressions) || 0,
+    clicks: parseFloat(r.Clicks) || 0, lpv: parseFloat(r['Landing Page Views']) || 0, row: r
+  })).filter(m => !isNaN(m.d));
+  const dates = leads.map(l => l.created.getTime()).concat(meta.map(m => m.d.getTime()));
+  const dataStart = dates.length ? new Date(Math.min.apply(null, dates)) : new Date(now.getTime() - 30 * CJ_DAY);
+  const P = cjPeriod(now, new Date(dataStart.getFullYear(), dataStart.getMonth(), dataStart.getDate()));
+  P.win = { start: P.start, end: P.end };
+  const sodStart = new Date(P.start.getFullYear(), P.start.getMonth(), P.start.getDate());
+  /* Baseline = everything before the selected period. Needs at least a week of history. */
+  const B = (sodStart - dataStart) >= 7 * CJ_DAY ? { start: dataStart, end: new Date(sodStart.getTime() - 1) } : null;
+  const C = { now, P, B, leads, meta, dataStart };
+  C.leadsIn = w => leads.filter(l => l.created >= w.start && l.created <= w.end);
+  C.metaIn = w => {
+    const s = new Date(w.start.getFullYear(), w.start.getMonth(), w.start.getDate());
+    const o = { spend:0, imp:0, clicks:0, lpv:0, rows:0 };
+    meta.forEach(m => { if(m.d >= s && m.d <= w.end){ o.spend += m.spend; o.imp += m.imp; o.clicks += m.clicks; o.lpv += m.lpv; o.rows++; } });
+    return o;
+  };
+  /* Sync health */
+  const stamps = list => { let best = null; list.forEach(v => { const d = v ? new Date(v) : null; if(d && !isNaN(d) && /T.*Z?$/.test(String(v)) && (!best || d > best)) best = d; }); return best; };
+  C.metaSync = stamps(META_ROWS.map(r => r['Synced At']));
+  C.ghlSync = stamps(GHL_ROWS.map(r => r['Synced At']));
+  const ages = [C.metaSync, C.ghlSync].filter(Boolean).map(d => (now - d) / 3600000);
+  C.syncHours = ages.length ? Math.max.apply(null, ages) : null;
+  C.metaStale = C.metaSync ? ((now - C.metaSync) / 3600000) > 24 : false;
+  return C;
+}
+
+/* ---------- check definitions ---------- */
+const CJ_CHECKS = {
+  offer: { id:'offer', label:'Leads per 1,000 people reached', short:'Leads per 1,000 Seen', type:'higher', unit:'n1', seed:CJ_SEED.offerPer1k, min:2000, needsMeta:true,
+    calc:(C,w)=>{ const m=C.metaIn(w), L=C.leadsIn(w).length; return { v: m.imp ? L / m.imp * 1000 : null, n: m.imp, L, imp: m.imp }; },
+    drive:(x)=>`Only ${cjFmt(x.value,'n1')} leads per 1,000 impressions, against a target of ${cjFmt(x.target,'n1')}.`,
+    act:()=>'Review the offer message and the hook in the ad.' },
+  leadsPace: { id:'leadsPace', label:'Leads', short:'Leads', type:'pace', unit:'int', seedPerDay:CJ_SEED.leadsPerWeek/7, noun:'leads',
+    calc:(C,w)=>({ v: C.leadsIn(w).length, n: C.leadsIn(w).length }),
+    perDay:(C)=>{
+      /* Average of full Sunday-Saturday weeks before the period, skipping the first partial week. Needs 2. */
+      const first = new Date(C.dataStart); first.setDate(first.getDate() + ((7 - first.getDay()) % 7 || 7));
+      const counts = [];
+      for(let s = new Date(first.getFullYear(), first.getMonth(), first.getDate()); ; s = new Date(s.getTime() + 7 * CJ_DAY)){
+        const e = new Date(s.getTime() + 7 * CJ_DAY);
+        if(e > C.B.end) break;
+        counts.push(C.leadsIn({ start:s, end:new Date(e.getTime() - 1) }).length);
+      }
+      return counts.length >= 2 ? counts.reduce((a,b)=>a+b,0) / counts.length / 7 : null;
+    },
+    drive:(x)=>`${x.value} leads against ${Math.round(x.expected)} expected by now (${Math.round(x.pace*100)}% of pace).`,
+    act:()=>'Check budget pacing and ad delivery in Meta, then cost per lead.' },
+  qualified: { id:'qualified', label:'Qualified leads', short:'Qualified', type:'higher', unit:'pct', seed:CJ_SEED.qualified, min:20,
+    calc:(C,w)=>{ const ls=C.leadsIn(w); const q=ls.filter(l=>l.qualified).length; return { v: ls.length ? q/ls.length : null, n: ls.length, q }; },
+    drive:(x)=>`${x.extra.q} of ${x.n} leads qualified (${cjFmt(x.value,'pct')}), against a target of ${cjFmt(x.target,'pct')}.`,
+    act:()=>'Review audience targeting and the form questions, and compare the qualified rate by ad.' },
+  cpl: { id:'cpl', label:'Cost per lead', short:'Cost per Lead', type:'lower', unit:'usd2', seed:CJ_SEED.cpl, warn:0.15, red:0.25, min:10, needsMeta:true,
+    calc:(C,w)=>{ const m=C.metaIn(w), L=C.leadsIn(w).length; return { v: (L && m.spend) ? m.spend / L : null, n: L }; },
+    drive:(x)=>`Cost per lead is ${cjFmt(x.value,'usd2')} against a ${cjFmt(x.target,'usd2')} target (${Math.round((x.value/x.target-1)*100)}% over).`,
+    act:()=>'Review budget pacing, the audience and the creative. Get a backup ad ready.' },
+  freq: { id:'freq', label:'Ad frequency (last 7 days)', short:'Frequency', type:'abs', unit:'x', needsMeta:true,
+    calc:(C)=>{
+      const rows = C.meta.filter(m => (m.row['Frequency 7d'] || '') !== '').sort((a,b)=>b.d-a.d);
+      return { v: rows.length ? parseFloat(rows[0].row['Frequency 7d']) : null, n: rows.length ? 1 : 0 };
+    },
+    band:(v)=> v < 2.5 ? 'ok' : (v < 4 ? 'warn' : 'bad'),
+    targetText:'under 2.5',
+    drive:(x)=>`The 7-day frequency is ${cjFmt(x.value,'x')}.`,
+    act:(x)=> x.value >= 4 ? 'Run a creative review. Do not pause the ad automatically.' : (x.value >= 2.5 ? 'Get a backup ad ready and tested.' : 'No action needed.') },
+  lpconv: { id:'lpconv', label:'Landing page conversion', short:'Page Conversion', type:'higher', unit:'pct', min:100, needsMeta:true,
+    seedFn:(C,x)=> x.basis === 'link clicks' ? CJ_SEED.lpConvClicks : null,
+    calc:(C,w)=>{ const m=C.metaIn(w), L=C.leadsIn(w).length; const den = m.clicks; return { v: den ? L/den : null, n: den, basis: 'link clicks' }; },
+    drive:(x)=>`${cjFmt(x.value,'pct')} of ${x.extra.basis} became leads, against a target of ${cjFmt(x.target,'pct')}.`,
+    act:()=>'Review the landing page: load speed, headline match with the ad, and the form.' },
+  syncAge: { id:'syncAge', label:'Data refresh age', short:'Data Refresh', type:'abs', unit:'hrs',
+    calc:(C)=>({ v: C.syncHours, n: C.syncHours === null ? 0 : 1 }),
+    band:(v)=> v < 1 ? 'ok' : (v < 24 ? 'warn' : 'bad'),
+    targetText:'under 1 hour',
+    drive:(x)=>`The last data refresh was ${cjFmt(x.value,'hrs')} ago.`,
+    act:()=>'Check the Apps Script triggers for the Meta and GoHighLevel syncs.' },
+  replyBooked: { id:'replyBooked', label:'Replied to booked', short:'Replied → Booked', type:'higher', unit:'pct', seed:CJ_SEED.replyBooked, min:10,
+    calc:(C,w)=>{ const ls=C.leadsIn(w).filter(l=>l.replied); const b=ls.filter(l=>l.bookedTag).length; return { v: ls.length ? b/ls.length : null, n: ls.length, b }; },
+    drive:(x)=>`${x.extra.b} of ${x.n} leads that replied booked (${cjFmt(x.value,'pct')}), against a target of ${cjFmt(x.target,'pct')}.`,
+    act:()=>"Review AI John's replies to leads who answered but did not book: tone, booking link and follow-up timing." },
+  replyRate: { id:'replyRate', label:'Reply rate', short:'Reply Rate', type:'info', unit:'pct',
+    calc:(C,w)=>{ const ls=C.leadsIn(w); const r=ls.filter(l=>l.replied).length; return { v: ls.length ? r/ls.length : null, n: ls.length, r }; } },
+  stuck: { id:'stuck', label:'Leads Stuck in Follow-Up 14+ Days', short:'Stuck 14+ Days', type:'abs', unit:'pct', min:5,
+    calc:(C,w)=>{ const ds=C.leadsIn(w).filter(l=>l.stage==='In Follow-Up' && l.entered).map(l=>(C.now-l.entered)/CJ_DAY); const k=ds.filter(d=>d>=14).length; return { v: ds.length ? k/ds.length : null, n: ds.length, k }; },
+    band:(v)=> v <= 0.20 ? 'ok' : (v <= 0.40 ? 'warn' : 'bad'),
+    targetText:'20% or less',
+    drive:(x)=>`${x.extra.k} of ${x.n} leads in Active Follow-Up have been there 14 days or more (${cjFmt(x.value,'pct')}). The goal is 20% or less.`,
+    act:()=>'Work the oldest follow-up leads first. Book them, move them forward or close them out.' },
+  followupDays: { id:'followupDays', label:'Days in Active Follow-Up', short:'Days in Follow-up', type:'info', unit:'days', seed:CJ_SEED.followupDays, warn:0.10, red:0.25, min:5,
+    calc:(C,w)=>{ const ds=C.leadsIn(w).filter(l=>l.stage==='In Follow-Up' && l.entered).map(l=>(C.now-l.entered)/CJ_DAY); return { v: ds.length ? ds.reduce((a,b)=>a+b,0)/ds.length : null, n: ds.length }; },
+    base:(C)=>cjCompletedStays(C,['In Follow-Up']),
+    drive:(x)=>`Leads have been in Active Follow-Up ${cjFmt(x.value,'days')} on average, against ${cjFmt(x.target,'days')}.`,
+    act:(x)=>`Set a daily follow-up list for the team and clear the leads older than ${Math.round(x.target)} days first.` },
+  noShow: { id:'noShow', label:'No-show rate', short:'No-show Rate', type:'lower', unit:'pct', warn:0.10, red:0.25, min:10,
+    ready:(C)=>C.leads.filter(l=>l.noShowEver).length >= 5,
+    calc:(C,w)=>{ const ls=C.leadsIn(w).filter(l=>l.booked); const k=ls.filter(l=>l.noShowEver).length; return { v: ls.length ? k/ls.length : null, n: ls.length, k }; },
+    selfBase:true,
+    drive:(x)=>`${x.extra.k} of ${x.n} booked appointments were no-shows (${cjFmt(x.value,'pct')}).`,
+    act:()=>'Add or tighten reminder texts and calls before each appointment.' },
+  resched: { id:'resched', label:'Reschedule rate', short:'Reschedule Rate', type:'lower', unit:'pct', warn:0.10, red:0.25, min:10,
+    ready:(C)=>C.leads.filter(l=>l.reschedEver).length >= 5,
+    calc:(C,w)=>{ const ls=C.leadsIn(w).filter(l=>l.booked); const k=ls.filter(l=>l.reschedEver).length; return { v: ls.length ? k/ls.length : null, n: ls.length, k }; },
+    selfBase:true,
+    drive:(x)=>`${x.extra.k} of ${x.n} booked appointments were rescheduled (${cjFmt(x.value,'pct')}).`,
+    act:()=>'Review booking times and reminder timing with the team.' },
+  postResched: { id:'postResched', label:'Rescheduled leads that no-showed', short:'No-show After Reschedule', type:'lower', unit:'pct', warn:0.10, red:0.25, min:5,
+    ready:(C)=>C.leads.filter(l=>l.reschedEver).length >= 5,
+    calc:(C,w)=>{ const ls=C.leadsIn(w).filter(l=>l.reschedEver); const k=ls.filter(l=>l.noShowAfterResched).length; return { v: ls.length ? k/ls.length : null, n: ls.length, k }; },
+    selfBase:true,
+    drive:(x)=>`${x.extra.k} of ${x.n} rescheduled leads still no-showed.`,
+    act:()=>'Call rescheduled leads the day before to confirm.' },
+  apptToClient: { id:'apptToClient', label:'Appointment to client', short:'Appt → Client', type:'higher', unit:'pct', seed:CJ_SEED.apptToClient, min:10,
+    calc:(C,w)=>{ const ls=C.leadsIn(w).filter(l=>l.booked); const c=ls.filter(l=>l.isClient).length; return { v: ls.length ? c/ls.length : null, n: ls.length, c }; },
+    drive:(x)=>`${x.extra.c} of ${x.n} booked appointments became clients (${cjFmt(x.value,'pct')}), against a target of ${cjFmt(x.target,'pct')}.`,
+    act:()=>'Review the recordings of appointments that did not close and tighten the close.' },
+  apptDays: { id:'apptDays', label:'Days in Appointment Stage', short:'Days in Appt Stage', type:'lower', unit:'days', warn:0.10, red:0.25, min:5,
+    calc:(C,w)=>{ const ds=C.leadsIn(w).filter(l=>['Meeting Booked','Rescheduled','No Show'].includes(l.stage) && l.entered).map(l=>(C.now-l.entered)/CJ_DAY); return { v: ds.length ? ds.reduce((a,b)=>a+b,0)/ds.length : null, n: ds.length }; },
+    base:(C)=>cjCompletedStays(C,['Meeting Booked','Rescheduled','No Show']),
+    drive:(x)=>`Booked leads have sat ${cjFmt(x.value,'days')} in the Appointment Stage, against ${cjFmt(x.target,'days')}.`,
+    act:()=>'Give every booked lead a next step within a week.' },
+  newClients: { id:'newClients', label:'New clients', short:'New Clients', type:'pace', unit:'int', seedPerDay:CJ_SEED.newClientsPerMonth/30.4375, noun:'clients',
+    calc:(C,w)=>{ const n=C.leads.filter(l=>l.isClient && (l.enrollAt||l.created) >= w.start && (l.enrollAt||l.created) <= w.end).length; return { v:n, n }; },
+    perDay:(C)=>{
+      const months=[]; let m = new Date(C.dataStart.getFullYear(), C.dataStart.getMonth(), 1);
+      while(new Date(m.getFullYear(), m.getMonth()+1, 1) <= C.B.end){
+        const s=m, e=new Date(m.getFullYear(), m.getMonth()+1, 1);
+        months.push(C.leads.filter(l=>l.isClient && (l.enrollAt||l.created) >= s && (l.enrollAt||l.created) < e).length);
+        m = e;
+      }
+      return months.length ? months.reduce((a,b)=>a+b,0)/months.length/30.4375 : null;
+    },
+    drive:(x)=>{ const gap = Math.round((x.expected - x.value)*10)/10; const close = x.pace >= 0.65 && x.pace < 0.9; return `${x.value} new clients so far against a goal of ${(Math.round(x.expected*10)/10)} by now (${CJ_SEED.newClientsPerMonth} a month).` + (close ? ` That is close to target, about ${gap <= 1.5 ? 'one client' : gap + ' clients'} short, not seriously behind.` : ''); },
+    act:()=>'Review where booked appointments are stalling in Sales.' },
+  cpa: { id:'cpa', label:'Cost per client', short:'Cost per Client', type:'lower', unit:'usd0', seed:CJ_SEED.cpa, warn:0.15, red:0.25, min:1, baseMin:2, needsMeta:true,
+    calc:(C,w)=>{ const m=C.metaIn(w); const n=C.leads.filter(l=>l.isClient && l.created>=w.start && l.created<=w.end).length; return { v: n ? m.spend/n : null, n }; },
+    drive:(x)=>`Cost per client is ${cjFmt(x.value,'usd0')} against a ${cjFmt(x.target,'usd0')} target.`,
+    act:()=>'Review cost per lead and the appointment-to-client rate; whichever is further off target is the lever.' },
+  salesReadyJoined: { id:'salesReadyJoined', label:'Sales-ready to joined', short:'Sales-ready → Joined', type:'higher', unit:'pct', min:10,
+    calc:(C,w)=>{ const ls=C.leadsIn(w).filter(l=>l.salesReady); const j=ls.filter(l=>l.isClient).length; return { v: ls.length ? j/ls.length : null, n: ls.length, j }; },
+    drive:(x)=>`${x.extra.j} of ${x.n} sales-ready opportunities joined (${cjFmt(x.value,'pct')}), against a target of ${cjFmt(x.target,'pct')}.`,
+    act:()=>'Call the sales-ready leads who have not joined and remove what is blocking them.' },
+  funding: { id:'funding', label:'Clients funded or on track', short:'Funded Or On Track', type:'funding', unit:'pct' }
+};
+
+/* Completed stays in a stage (from Stage Path), used as a rolling target for the days-in-stage checks. */
+function cjCompletedStays(C, stages){
+  const d = [];
+  C.leads.forEach(l => { for(let i = 0; i < l.path.length - 1; i++){
+    if(stages.includes(l.path[i].stage) && l.path[i].at && l.path[i+1].at) d.push((l.path[i+1].at - l.path[i].at) / CJ_DAY);
+  }});
+  return { v: d.length ? d.reduce((a,b)=>a+b,0)/d.length : null, n: d.length };
+}
+
+/* ---------- evaluating one check ---------- */
+function cjEvalCheck(def, C){
+  const o = { id:def.id, def, label:def.label, short:def.short||def.label, unit:def.unit, type:def.type,
+    scored: def.type !== 'info', status:'none', note:'', value:null, n:0, target:null, targetSrc:null, extra:{}, ahead:false };
+  const cur = def.calc ? def.calc(C, C.P.win) : { v:null, n:0 };
+  o.value = cur.v; o.n = cur.n; o.extra = cur;
+  if(def.type === 'info'){ return o; }
+  if(def.needsMeta && C.metaStale){ o.note = 'Data not syncing'; return o; }
+  if(def.ready && !def.ready(C)){ o.note = 'Collecting data'; return o; }
+
+  if(def.type === 'abs'){
+    if(o.value === null || o.value === undefined || isNaN(o.value)){ o.note = 'Collecting data'; return o; }
+    if(def.min && o.n < def.min){ o.note = 'Collecting data (' + o.n + ' of ' + def.min + ' needed)'; return o; }
+    o.status = def.band(o.value); o.targetText = def.targetText; return o;
+  }
+  if(def.type === 'pace'){
+    let perDay = null, src = null;
+    if(def.seedPerDay){ perDay = def.seedPerDay; src = 'seed'; }
+    if(perDay === null && C.B){ const pd = def.perDay(C); if(pd !== null){ perDay = pd; src = 'rolling'; } }
+    if(perDay === null){ o.note = 'Collecting data'; return o; }
+    const expected = perDay * C.P.elapsed;
+    o.expected = expected; o.perDay = perDay; o.targetSrc = src;
+    o.target = C.P.total ? perDay * C.P.total : expected;
+    if(expected < 1){ o.note = 'Too early in the period'; return o; }
+    const pace = o.value / expected; o.pace = pace;
+    let st = (pace >= 0.9 || (C.P.total && o.value >= perDay * C.P.total)) ? 'ok' : (pace >= 0.65 ? 'warn' : 'bad');
+    if(st === 'bad' && C.P.total && C.P.elapsed / C.P.total < 0.2 && !(o.value === 0 && expected >= 2)) st = 'warn';
+    o.status = st; o.ahead = st === 'ok' && pace >= 1.2;
+    return o;
+  }
+  /* higher / lower */
+  let tgt = null, src = null;
+  { const s0 = def.seedFn ? def.seedFn(C, cur) : def.seed; if(s0 !== null && s0 !== undefined){ tgt = s0; src = 'seed'; } }
+  if(tgt === null && C.B){
+    const b = def.base ? def.base(C) : def.calc(C, C.B);
+    if(b && b.v !== null && b.v !== undefined && b.n >= (def.baseMin || def.min || 1)){ tgt = b.v; src = 'rolling'; }
+  }
+  if(tgt === null && def.selfBase){
+    const b = def.calc(C, { start:C.dataStart, end:C.now });
+    if(b && b.v !== null && b.n >= def.min){ tgt = b.v; src = 'all-time'; }
+  }
+  if(tgt === null){ const s = def.seedFn ? def.seedFn(C, cur) : def.seed; if(s !== null && s !== undefined){ tgt = s; src = 'seed'; } }
+  o.target = tgt; o.targetSrc = src;
+  if(o.value === null || o.value === undefined || isNaN(o.value)){ o.note = 'Collecting Data'; return o; }
+  if(o.n < (def.min || 1)){ o.note = 'Collecting data (' + o.n + ' of ' + def.min + ' needed)'; return o; }
+  if(tgt === null || tgt === 0){ o.note = 'Collecting data'; return o; }
+  const ratio = o.value / tgt; o.ratio = ratio;
+  if(def.type === 'higher') o.status = ratio >= 0.9 ? 'ok' : (ratio >= 0.65 ? 'warn' : 'bad');
+  else o.status = ratio <= 1 + (def.warn || 0.10) ? 'ok' : (ratio <= 1 + (def.red || 0.25) ? 'warn' : 'bad');
+  return o;
+}
+
+/* ---------- funding box ---------- */
+function cjEvalFunding(C){
+  const def = CJ_CHECKS.funding;
+  const o = { id:'funding', def, label:def.label, short:'Funded Or On Track', unit:'pct', type:'funding', scored:true, status:'none', note:'', value:null, n:0, extra:{} };
+  const clients = C.leads.filter(l => l.isClient && (l.enrollAt || l.created) >= C.P.start && (l.enrollAt || l.created) <= C.P.end);
+  const live = C.leads.some(l => l.isFunded);
+  const rows = clients.map(l => {
+    const days = (C.now - (l.enrollAt || l.created)) / CJ_DAY;
+    const funded = l.isFunded;
+    const st = funded || days <= CJ_FUNDING_GREEN_DAYS ? 'ok' : (days <= CJ_FUNDING_ORANGE_DAYS ? 'warn' : 'bad');
+    return { l, days, funded, st, onTrack: funded || days <= CJ_FUNDING_GREEN_DAYS };
+  });
+  const funded = rows.filter(r => r.funded).length, on = rows.filter(r => r.onTrack).length, past = rows.filter(r => !r.funded && r.days > CJ_FUNDING_GREEN_DAYS).length;
+  o.extra = { clients: rows.length, funded, on, past, live };
+  o.n = rows.length;
+  if(!rows.length){ o.note = 'No clients enrolled in this range'; return o; }
+  o.value = on / rows.length;
+  o.status = o.value >= 0.8 ? 'ok' : (o.value >= 0.5 ? 'warn' : 'bad');
+  return o;
+}
+
+/* ---------- the whole scorecard ---------- */
+const CJ_RANK = { bad:3, warn:2, ok:1, none:0 };
+function cjEvaluate(C){
+  const stages = CJ_STAGE_META.map(m => {
+    const checks = m.checks.map(id => id === 'funding' ? cjEvalFunding(C) : cjEvalCheck(CJ_CHECKS[id], C));
+    const scored = checks.filter(c => c.scored && c.status !== 'none');
+    let status = 'none';
+    scored.forEach(c => { if(CJ_RANK[c.status] > CJ_RANK[status]) status = c.status; });
+    const worst = scored.filter(c => c.status === status).sort((a,b)=>0)[0] || checks.find(c => c.scored) || checks[0];
+    const ahead = status === 'ok' && checks.some(c => c.ahead);
+    return { meta:m, checks, status, worst, ahead, n:m.n, name:m.name, lc:m.lc };
+  });
+  const links = CJ_LINKS.filter(l => ['warn','bad'].includes(stages[l[0]-1].status) && ['warn','bad'].includes(stages[l[1]-1].status));
+  return { stages, links, C };
+}
+
+/* ---------- copy ---------- */
+function cjCheckValueText(c){
+  if(c.type === 'funding') return c.value === null ? '' : (c.extra.funded + ' of ' + c.extra.clients + ' funded');
+  if(c.type === 'pace') return c.value + ' · Goal ' + Math.round(c.expected || 0);
+  return cjFmt(c.value, c.unit);
+}
+function cjCheckLine(c){
+  if(c.type === 'funding'){
+    if(!c.extra.clients) return 'No clients enrolled in this range.';
+    return `${c.extra.on} of ${c.extra.clients} enrolled clients are funded or inside the ${CJ_FUNDING_GREEN_DAYS}-day window` + (c.extra.past ? `; ${c.extra.past} past ${CJ_FUNDING_GREEN_DAYS} days.` : '.');
+  }
+  if(c.type === 'pace' && c.status !== 'none') return `${c.value} ${c.def.noun} so far. The goal by now is ${Math.round(c.expected*10)/10}, which is ${Math.round(c.pace*100)}% of the way there.`;
+  if(c.status === 'none'){
+    const val = (c.value !== null && c.value !== undefined && !isNaN(c.value) && /needed\)/.test(c.note || '')) ? ` So far: ${cjFmt(c.value, c.unit)}.` : '';
+    return `${c.label}: ${c.note || 'collecting data'}.${val}`;
+  }
+  if(c.type === 'abs') return `${c.label} is ${cjFmt(c.value, c.unit)}, target ${c.targetText}.`;
+  const diff = Math.round(Math.abs(c.ratio - 1) * 100);
+  if(diff === 0) return `${c.label} is ${cjFmt(c.value, c.unit)}, on the ${cjFmt(c.target, c.unit)} target.`;
+  const dir = c.type === 'higher' ? (c.ratio >= 1 ? 'above' : 'below') : (c.ratio <= 1 ? 'below' : 'above');
+  if(c.status === 'ok' && dir === 'above' && c.type === 'lower') return `${c.label} is ${cjFmt(c.value, c.unit)}, ${diff}% above the ${cjFmt(c.target, c.unit)} target but still inside the On Track range.`;
+  return `${c.label} is ${cjFmt(c.value, c.unit)}, ${diff}% ${dir} the ${cjFmt(c.target, c.unit)} target.`;
+}
+function cjStageLine(s){
+  if(s.status === 'none'){
+    const c = s.checks.find(x => x.scored);
+    return (c && c.note ? c.note + '. ' : '') + 'No scored result this period. This is the next place we will measure.';
+  }
+  const bad = s.checks.filter(c => c.scored && c.status !== 'none' && c.status !== 'ok');
+  if(bad.length) return bad.slice(0, 2).map(cjCheckLine).join(' ');
+  return cjCheckLine(s.worst);
+}
+function cjDetails(s, R){
+  const trip = s.checks.filter(c => c.scored && ['warn','bad'].includes(c.status));
+  const happening = s.checks.filter(c => c.scored).map(cjCheckLine).join(' ');
+  const why = s.meta.why;
+  let driving, act;
+  if(s.status === 'none'){ driving = 'Not measured yet. This is the next place we will measure.'; act = 'Keep collecting data. The score turns on automatically once there is enough.'; }
+  else if(!trip.length){ driving = 'No rule is tripped. Every scored check is at or above its target.'; act = 'No action needed. Keep the current approach and keep watching the weekly pace.'; }
+  else {
+    driving = trip.map(c => c.def.drive ? c.def.drive(c) : cjCheckLine(c)).join(' ');
+    const offerTrip = trip.some(c => c.id === 'offer');
+    if(offerTrip){
+      const f = R.stages[1].checks.find(c => c.id === 'freq');
+      if(f && f.value !== null && f.value !== undefined && f.value >= 2.5) driving += ` Frequency is ${cjFmt(f.value,'x')}, so ad fatigue is part of this.`;
+    }
+    act = trip.map(c => c.def.act ? c.def.act(c) : '').filter(Boolean).join(' ');
+    if(trip.some(c => c.id === 'funding')){ driving = cjCheckLine(trip[0]); act = 'Review each enrolled client past ' + CJ_FUNDING_GREEN_DAYS + ' days and confirm the funding plan with Jay.'; }
+  }
+  return [["What's happening", happening], ['Why it matters', why], ["What's driving it", driving], ["What we'll do", act]];
+}
+function cjSummary(R){
+  const st = R.stages;
+  const cnt = { bad:0, warn:0, ok:0, none:0 };
+  st.forEach(s => cnt[s.status]++);
+  const attention = st.filter(s => s.status === 'bad' || s.status === 'warn').sort((a,b)=>CJ_RANK[b.status]-CJ_RANK[a.status]);
+  const actions = [];
+  attention.forEach(s => { const t = s.checks.filter(c => c.scored && ['warn','bad'].includes(c.status)).map(c => c.def.act ? c.def.act(c) : '').filter(Boolean)[0]; if(t && actions.length < 3) actions.push([s, t.split('. ')[0].replace(/\.$/,'') + '.']); });
+  let head;
+  if(cnt.bad) head = st.filter(s => s.status === 'bad').slice(0, 2).map(s => s.name.replace(' & Booking','')).join(' and ');
+  else if(cnt.warn) head = st.filter(s => s.status === 'warn').slice(0, 2).map(s => s.name.replace(' & Booking','')).join(' and ');
+  else head = cnt.ok ? 'All scored stages on track' : 'Collecting data';
+  return { cnt, attention, actions, head };
+}
+
+/* ---------- Scorecard drawing ---------- */
+const CJ_LBL = { ok:'On Track', warn:'Needs Improvement', bad:'Needs Immediate Attention', none:'Collecting Data' };
+const CJ_COL = { ok:'var(--ok)', warn:'var(--warn)', bad:'var(--bad)', none:'var(--none)' };
+const CJ_DH = ["What's happening", 'Why it matters', "What's driving it", "What we'll do"];
+const cjState = { mode:'sum', cur:-1, openDetails:false, R:null };
+const CJ_SP = 144, CJ_R = 33, CJ_BW = 138, CJ_NY = 134, CJ_H = 346;
+const cjX = i => 76 + i * CJ_SP;
+
+function cjShortNote(c){
+  if(!c.note) return 'Collecting Data';
+  if(/^Collecting/.test(c.note)) return 'Collecting Data';
+  if(/Funded stage/.test(c.note)) return 'Awaiting Funded Stage';
+  if(/not syncing/.test(c.note)) return 'Data Not Syncing';
+  return c.note.length > 20 ? 'Collecting Data' : c.note;
+}
+function cjBoxRows(s){
+  const by = id => s.checks.find(c => c.id === id);
+  const row = (c, label) => {
+    if(c.type === 'info' && c.value !== null && c.value !== undefined && !isNaN(c.value)) return [label || c.short, cjCheckValueText(c), false];
+    if(c.status === 'none') return [label || c.short, cjShortNote(c), true];
+    return [label || c.short, cjCheckValueText(c), false];
+  };
+  switch(s.n){
+    case 1: return [row(by('offer'))];
+    case 2: return [row(by('leadsPace')), row(by('cpl'))];
+    case 3: return [row(by('replyBooked')), row(by('replyRate'))];
+    case 4: return [row(by('stuck')), row(by('followupDays'))];
+    case 5: return [row(by('apptToClient'))];
+    case 6: return [row(by('newClients')), row(by('cpa'))];
+    case 7: return [row(by('salesReadyJoined'))];
+    case 8: { const f = by('funding'); return [ f.value === null ? [ 'Clients Funded', cjShortNote(f), true ] : [ 'Clients Funded', f.extra.funded + ' of ' + f.extra.clients, false ], [ 'Past ' + CJ_FUNDING_GREEN_DAYS + ' Days', f.value === null ? 'No Clients Yet' : String(f.extra.past), false ] ]; }
+  }
+  return [];
+}
+function cjDefs(){
+  let d = '<defs><filter id="cj-glow" x="-80%" y="-80%" width="260%" height="260%"><feGaussianBlur stdDeviation="9"/></filter>' +
+    '<filter id="cj-soft" x="-20%" y="-20%" width="140%" height="160%"><feDropShadow dx="0" dy="8" stdDeviation="9" flood-color="#101a3d" flood-opacity=".14"/></filter>' +
+    '<linearGradient id="cj-prog" x1="0" x2="1"><stop offset="0" style="stop-color:var(--brand-3)"/><stop offset="1" style="stop-color:var(--brand)"/></linearGradient>' +
+    '<linearGradient id="cj-zone" x1="0" x2="0" y1="0" y2="1"><stop offset="0" style="stop-color:var(--zone-a)"/><stop offset="1" style="stop-color:var(--zone-b)"/></linearGradient>' +
+    '<linearGradient id="cj-phl" x1="0" x2="1"><stop offset="0" style="stop-color:var(--brand)" stop-opacity=".7"/><stop offset="1" style="stop-color:var(--brand)" stop-opacity="0"/></linearGradient>';
+  ['ok','warn','bad','none'].forEach(k => {
+    d += '<radialGradient id="cj-f-' + k + '" cx="50%" cy="35%" r="70%"><stop offset="0" style="stop-color:' + CJ_COL[k] + '" stop-opacity=".38"/><stop offset="1" style="stop-color:' + CJ_COL[k] + '" stop-opacity=".06"/></radialGradient>';
+    d += '<radialGradient id="cj-c-' + k + '" cx="50%" cy="30%" r="80%"><stop offset="0" style="stop-color:' + CJ_COL[k] + '" stop-opacity=".34"/><stop offset="1" style="stop-color:' + CJ_COL[k] + '" stop-opacity=".14"/></radialGradient>';
+    d += '<linearGradient id="cj-r-' + k + '" x1="0" x2="0" y1="0" y2="1"><stop offset="0" stop-color="#fff" stop-opacity=".9"/><stop offset=".25" style="stop-color:' + CJ_COL[k] + '"/><stop offset="1" style="stop-color:' + CJ_COL[k] + '"/></linearGradient>';
+  });
+  return d + '</defs>';
+}
+function cjDrawMap(R){
+  const S = R.stages, st = cjState, run = st.mode === 'run';
+  const FL = {};
+  if(run){ const c = st.cur + 1; R.links.forEach(l => { if(l[1] === c) FL[l[0]-1] = 'AFFECTS STAGE ' + c; if(l[0] === c) FL[l[1]-1] = 'AFFECTED BY STAGE ' + c; }); }
+  let g = cjDefs();
+  if(!run){
+    const late = S.slice(5).filter(s => ['warn','bad'].includes(s.status)).length;
+    if(late >= 2){
+      const za = cjX(5) - CJ_BW/2 - 10, zb = cjX(7) + CJ_BW/2 + 10;
+      g += '<g class="cj-zone-in"><rect x="' + za + '" y="44" width="' + (zb-za) + '" height="' + (CJ_H-48) + '" rx="16" fill="url(#cj-zone)" stroke="var(--warn)" stroke-opacity=".45" stroke-dasharray="5 6"/>' +
+        '<rect x="' + ((za+zb)/2-122) + '" y="56" width="244" height="24" rx="12" fill="var(--warn-soft)" stroke="var(--warn)" stroke-opacity=".35"/>' +
+        '<text x="' + ((za+zb)/2) + '" y="72" text-anchor="middle" font-size="11.5" font-weight="700" letter-spacing="1.4" fill="var(--warn)" font-family="var(--f-mono)">POTENTIAL DOWNSTREAM IMPACT</text></g>';
+    }
+  }
+  CJ_PHASES.forEach(p => { const a = cjX(p[0]) - CJ_BW/2, b = cjX(p[1]) + CJ_BW/2;
+    g += '<circle cx="' + (a+3) + '" cy="12" r="3" fill="var(--brand)"/><text x="' + (a+13) + '" y="16" font-size="11.5" letter-spacing="2" fill="var(--muted)" font-family="var(--f-mono)">' + p[2] + '</text><rect x="' + a + '" y="26" width="' + (b-a) + '" height="1.5" fill="url(#cj-phl)"/>'; });
+  g += '<line x1="' + cjX(0) + '" x2="' + cjX(7) + '" y1="' + CJ_NY + '" y2="' + CJ_NY + '" stroke="var(--track)" stroke-width="10" stroke-linecap="round"/>';
+  g += '<line x1="' + cjX(0) + '" x2="' + cjX(7) + '" y1="' + (CJ_NY-2) + '" y2="' + (CJ_NY-2) + '" stroke="var(--track-hi)" stroke-width="1.5" stroke-linecap="round" opacity=".6"/>';
+  const pe = run ? st.cur : 7;
+  if(pe > 0){
+    g += '<rect x="' + (cjX(0)-4) + '" y="' + (CJ_NY-7) + '" width="' + (cjX(pe)-cjX(0)+8) + '" height="14" rx="7" fill="var(--brand)" opacity=".35" filter="url(#cj-glow)"/>' +
+      '<rect x="' + (cjX(0)-3) + '" y="' + (CJ_NY-3) + '" width="' + (cjX(pe)-cjX(0)+6) + '" height="6" rx="3" fill="url(#cj-prog)"/>' +
+      '<line class="cj-flow" x1="' + cjX(0) + '" x2="' + cjX(pe) + '" y1="' + CJ_NY + '" y2="' + CJ_NY + '" stroke="#fff" stroke-opacity=".55" stroke-width="2" stroke-linecap="round" stroke-dasharray="3 29"/>';
+  }
+  S.forEach((s, i) => {
+    const x = cjX(i), k = s.status, act = run && i === st.cur, isSrc = (i in FL);
+    g += '<g class="cj-node" data-i="' + i + '" tabindex="0" role="button" aria-label="Stage ' + s.n + ', ' + cjEsc(s.name) + ', ' + CJ_LBL[k] + '">';
+    g += '<rect x="' + (x-CJ_BW/2) + '" y="' + (CJ_NY-CJ_R-16) + '" width="' + CJ_BW + '" height="' + (CJ_R*2+74+90) + '" fill="transparent"/>';
+    g += '<circle cx="' + x + '" cy="' + CJ_NY + '" r="' + (CJ_R+4) + '" fill="' + CJ_COL[k] + '" opacity="' + (k === 'bad' ? .42 : .28) + '" filter="url(#cj-glow)"/>';
+    if(act) g += '<circle cx="' + x + '" cy="' + CJ_NY + '" r="' + (CJ_R+13) + '" fill="var(--brand)" opacity=".22" filter="url(#cj-glow)"/><circle class="cj-active" cx="' + x + '" cy="' + CJ_NY + '" r="' + (CJ_R+10) + '" fill="none" stroke="var(--brand)" stroke-width="1.8" stroke-dasharray="7 6"/>';
+    if(isSrc) g += '<circle class="cj-halo" cx="' + x + '" cy="' + CJ_NY + '" r="' + CJ_R + '" fill="none" stroke="var(--bad)" stroke-width="5"/><circle cx="' + x + '" cy="' + CJ_NY + '" r="' + (CJ_R+4) + '" fill="var(--bad)" opacity=".18" filter="url(#cj-glow)"/>';
+    g += '<circle cx="' + x + '" cy="' + CJ_NY + '" r="' + CJ_R + '" fill="url(#cj-f-' + k + ')" stroke="url(#cj-r-' + k + ')" stroke-width="4"/>';
+    g += '<circle cx="' + x + '" cy="' + CJ_NY + '" r="' + (CJ_R-7) + '" fill="var(--core)"/><circle class="cj-core" cx="' + x + '" cy="' + CJ_NY + '" r="' + (CJ_R-7) + '" fill="url(#cj-c-' + k + ')" stroke="' + CJ_COL[k] + '" stroke-opacity=".35" stroke-width="1"/>';
+    g += '<text x="' + x + '" y="' + (CJ_NY+8.5) + '" text-anchor="middle" font-size="24" font-weight="700" fill="var(--ink)" font-family="var(--f-display)">' + s.n + '</text>';
+    if(isSrc){ const w = FL[i].length > 16 ? 156 : 128; g += '<g filter="url(#cj-soft)"><rect x="' + (x-w/2) + '" y="' + (CJ_NY-CJ_R-34) + '" width="' + w + '" height="22" rx="11" fill="var(--bad)"/></g><text x="' + x + '" y="' + (CJ_NY-CJ_R-19) + '" text-anchor="middle" font-size="10.5" font-weight="700" letter-spacing="1" fill="#fff" font-family="var(--f-mono)">' + FL[i] + '</text>'; }
+    const nm = s.name.split(' '), two = nm.length > 1 && s.name.length > 12;
+    g += '<text x="' + x + '" y="' + (CJ_NY+CJ_R+24) + '" text-anchor="middle" font-size="15" font-weight="600" fill="var(--ink)" font-family="var(--f-body)">' + (two ? '<tspan x="' + x + '">' + cjEsc(nm[0]) + '</tspan><tspan x="' + x + '" dy="17">' + cjEsc(nm.slice(1).join(' ')) + '</tspan>' : cjEsc(s.name)) + '</text>';
+    g += '<text x="' + x + '" y="' + (CJ_NY+CJ_R+(two ? 62 : 44)) + '" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="var(--f-body)">' + cjEsc(s.lc) + '</text>';
+    const by = CJ_NY + CJ_R + 76, rows = cjBoxRows(s), bh = rows.length * 44 + 12, bc = CJ_COL[k];
+    g += '<g class="cj-pop"><rect x="' + (x-CJ_BW/2) + '" y="' + by + '" width="' + CJ_BW + '" height="' + bh + '" rx="10" fill="var(--box)" stroke="var(--boxline)" filter="url(#cj-soft)"/>';
+    g += '<rect x="' + (x-CJ_BW/2) + '" y="' + by + '" width="' + CJ_BW + '" height="' + bh + '" rx="10" fill="none" stroke="' + bc + '" stroke-opacity=".55"/><rect x="' + (x-CJ_BW/2+14) + '" y="' + by + '" width="' + (CJ_BW-28) + '" height="2.5" rx="1.25" fill="' + bc + '"/>';
+    rows.forEach((r, j) => { const yy = by + 24 + j * 44;
+      g += '<text x="' + x + '" y="' + yy + '" text-anchor="middle" font-size="12" fill="var(--muted)" font-family="var(--f-body)">' + cjEsc(r[0]) + '</text>';
+      g += '<text x="' + x + '" y="' + (yy+19) + '" text-anchor="middle" font-size="' + (r[2] ? 13 : 15) + '" font-weight="' + (r[2] ? 500 : 700) + '" fill="' + (r[2] ? 'var(--muted)' : 'var(--ink)') + '" font-family="var(--f-body)">' + cjEsc(r[1]) + '</text>'; });
+    g += '</g></g>';
+  });
+  const svg = document.getElementById('cj-map');
+  svg.setAttribute('viewBox', '0 0 1160 ' + (CJ_H + 14));
+  svg.innerHTML = g;
+  svg.querySelectorAll('.cj-node').forEach(n => {
+    const go = () => { cjState.mode = 'run'; cjState.cur = +n.dataset.i; cjRender(); };
+    n.addEventListener('click', go);
+    n.addEventListener('keydown', e => { if(e.key === 'Enter' || e.key === ' '){ e.preventDefault(); go(); } });
+  });
+}
+
+function cjProg(n){ let h = '<div class="cj-prog">'; for(let i = 0; i < 8; i++) h += '<i class="' + (i < n ? 'cj-on' : '') + '"></i>'; return h + '<span>' + (cjState.mode === 'sum' ? '8 stages' : (cjState.cur + 1) + ' / 8') + '</span></div>'; }
+function cjCtl(){
+  const sum = cjState.mode === 'sum';
+  const nextLabel = sum ? 'Step through' : (cjState.cur === 7 ? 'Summary' : 'Next stage');
+  return '<div class="cj-ctl">' + cjProg(sum ? 8 : cjState.cur + 1) + '<div class="cj-btns"><button class="cj-btn" id="cj-back"' + (sum ? ' disabled' : '') + '>Back</button><button class="cj-btn cj-primary" id="cj-next">' + nextLabel + '</button></div></div>';
+}
+function cjCards(arr, actIdx){ return arr.map((c, j) => '<div class="cj-mcard' + (j === actIdx ? ' cj-act' : '') + '"><div class="cj-label"><i></i>' + cjEsc(c[0]) + '</div><p>' + cjEsc(c[1]) + '</p></div>').join(''); }
+function cjHeadlineKpi(s){
+  const c = s.worst;
+  if(!c) return '<div class="cj-kpi"><div class="cj-txt" style="color:var(--muted)">Collecting data</div></div>';
+  if(s.n === 8){
+    const f = c;
+    return '<div class="cj-kpi"><div class="cj-k">Clients funded or on track</div>' + (f.value === null ? '<div class="cj-txt" style="color:var(--muted)">' + cjEsc(cjShortNote(f)) + '</div>' : '<div class="cj-row"><span class="cj-b">80%</span><span class="cj-ar">→</span><span class="cj-a" style="color:' + CJ_COL[s.status] + '">' + cjFmt(f.value, 'pct') + '</span></div><div class="cj-k">' + f.extra.on + ' of ' + f.extra.clients + ' enrolled clients</div>') + '</div>';
+  }
+  if(c.status === 'none'){
+    const has = c.value !== null && c.value !== undefined && !isNaN(c.value) && /needed\)/.test(c.note || '');
+    return '<div class="cj-kpi"><div class="cj-k">' + cjEsc(c.label) + '</div><div class="cj-txt" style="color:var(--muted)">' + cjEsc(cjShortNote(c)) + '</div>' + (has ? '<div class="cj-k">So far: ' + cjEsc(cjFmt(c.value, c.unit)) + ' (' + cjEsc(c.note.replace(/^Collecting data \(/,'').replace(/\)$/,'')) + ')</div>' : '') + '</div>';
+  }
+  if(c.type === 'pace') return '<div class="cj-kpi"><div class="cj-k">' + cjEsc(c.label) + '</div><div class="cj-row"><span class="cj-b">' + Math.round(c.expected) + '</span><span class="cj-ar">→</span><span class="cj-a" style="color:' + CJ_COL[s.status] + '">' + c.value + '</span></div><div class="cj-k">expected by now → actual · ' + Math.round(c.pace * 100) + '% of pace</div></div>';
+  if(c.type === 'abs') return '<div class="cj-kpi"><div class="cj-k">' + cjEsc(c.label) + '</div><div class="cj-row"><span class="cj-b">' + cjEsc(c.targetText) + '</span><span class="cj-ar">→</span><span class="cj-a" style="color:' + CJ_COL[c.status] + '">' + cjEsc(cjFmt(c.value, c.unit)) + '</span></div></div>';
+  const srcTxt = c.targetSrc === 'rolling' ? 'rolling average of earlier data' : (c.targetSrc === 'all-time' ? 'all-time average' : 'starting benchmark');
+  return '<div class="cj-kpi"><div class="cj-k">' + cjEsc(c.label) + '</div><div class="cj-row"><span class="cj-b">' + cjEsc(cjFmt(c.target, c.unit)) + '</span><span class="cj-ar">→</span><span class="cj-a" style="color:' + CJ_COL[c.status] + '">' + cjEsc(cjFmt(c.value, c.unit)) + '</span></div><div class="cj-k">target (' + srcTxt + ') → now</div></div>';
+}
+function cjDrawBar(R){
+  const bar = document.getElementById('cj-bar'), st = cjState;
+  const S = R.stages, sm = cjSummary(R);
+  let h = '';
+  if(st.mode === 'sum'){
+    const total = sm.cnt.bad + sm.cnt.warn;
+    const chip = sm.cnt.bad ? '<span class="cj-chip cj-c-bad"><i></i>' + total + ' need attention</span>' : sm.cnt.warn ? '<span class="cj-chip cj-c-warn"><i></i>' + total + ' need improvement</span>' : sm.cnt.ok ? '<span class="cj-chip cj-c-ok"><i></i>On track</span>' : '<span class="cj-chip cj-c-none"><i></i>Collecting data</span>';
+    const stepChip = (s, cls) => '<span class="cj-step ' + (cls || '') + '" data-st="' + (s.n-1) + '">' + cjEsc(s.name.replace(' & Booking','')) + '</span>';
+    let connect = '';
+    if(R.links.length) connect += '<div class="cj-row2"><span class="cj-tagk">AFFECTING EACH OTHER</span>' + R.links.map(l => stepChip(S[l[0]-1], S[l[0]-1].status === 'warn' ? 'cj-s-warn' : '') + '<span class="cj-to">→</span>' + stepChip(S[l[1]-1], S[l[1]-1].status === 'warn' ? 'cj-s-warn' : '')).join('<span style="width:10px"></span>') + '</div>';
+    if(sm.attention.length) connect += '<div class="cj-row2"><span class="cj-tagk">NEEDS ATTENTION</span>' + sm.attention.map(s => stepChip(s, s.status === 'warn' ? 'cj-s-warn' : '')).join('') + '</div>';
+    if(!connect) connect = '<p>' + (sm.cnt.ok ? 'Every scored stage is on track, so nothing is affecting anything else right now.' : 'Not enough data yet to score the journey.') + '</p>';
+    const pri = sm.actions.length ? '<div class="cj-pri">' + sm.actions.map((a, i) => '<div><b>' + (i+1) + '</b>' + cjEsc(a[0].name.replace(' & Booking','') + ': ' + a[1]) + '</div>').join('') + '</div>' : '<div class="cj-pri"><div>Nothing needs fixing right now.</div></div>';
+    h = '<div class="cj-who"><div class="cj-num">8/8</div><div><div class="cj-label">Scorecard summary</div><h2>' + cjEsc(sm.head) + '</h2>' + chip + '</div></div>' +
+      '<div class="cj-say"><div class="cj-label">How they connect</div><div class="cj-sum">' + connect + '</div></div>' +
+      '<div class="cj-kpi"><div class="cj-label">Start with</div>' + pri + '</div>' + cjCtl();
+    const worstLines = sm.attention.slice(0, 3).map(s => cjStageLine(s)).join(' ');
+    const linkLines = R.links.length ? R.links.map(l => 'Stage ' + l[0] + ' is affecting Stage ' + l[1] + '. ' + l[2]).join(' ') : 'No two stages are off track at the same time, so no stage is affecting another right now.';
+    h += '<details class="cj-more"' + (st.openDetails ? ' open' : '') + '><summary>Details</summary><div class="cj-mgrid">' + cjCards([
+      ["What's happening", sm.cnt.ok + ' on track, ' + sm.cnt.warn + ' need improvement, ' + sm.cnt.bad + ' need immediate attention, ' + sm.cnt.none + ' collecting data.'],
+      ['How it connects', linkLines],
+      ["What it's costing", worstLines || 'No stage is behind its target.'],
+      ["What we'll do first", sm.actions.length ? sm.actions[0][0].name.replace(' & Booking','') + ': ' + sm.actions[0][1] : 'Keep the current approach and keep watching the weekly pace.']
+    ], 3) + '</div></details>';
+  } else {
+    const s = S[st.cur], c = st.cur + 1;
+    const sigs = CJ_LINKS.filter(l => (l[0] === c || l[1] === c) && R.links.includes(l)).map(l => l[1] === c ? 'Stage ' + l[0] + ' is affecting this stage. ' + l[2] : 'This stage is affecting Stage ' + l[1] + '. ' + l[2]);
+    h = '<div class="cj-who"><div class="cj-num">' + String(s.n).padStart(2, '0') + '</div><div><div class="cj-label">' + cjEsc(s.lc) + '</div><h2>' + cjEsc(s.name) + '</h2><span class="cj-chip cj-c-' + s.status + '"><i></i>' + CJ_LBL[s.status] + '</span>' + (s.ahead ? '<span class="cj-ahead">Ahead</span>' : '') + '</div></div>' +
+      '<div class="cj-say"><p>' + cjEsc(cjStageLine(s)) + '</p>' + sigs.map(t => '<div class="cj-sig"><i></i>' + cjEsc(t) + '</div>').join('') + '</div>' +
+      cjHeadlineKpi(s) + cjCtl() +
+      '<details class="cj-more"' + (st.openDetails ? ' open' : '') + '><summary>Details</summary><div class="cj-mgrid">' + cjCards(cjDetails(s, R), 3) + '</div></details>';
+  }
+  bar.className = 'cj-bar' + (st.mode === 'sum' ? ' cj-sumbar' : '');
+  bar.innerHTML = h;
+  const det = bar.querySelector('details.cj-more'); if(det) det.addEventListener('toggle', () => { cjState.openDetails = det.open; });
+  document.getElementById('cj-next').onclick = cjNext;
+  document.getElementById('cj-back').onclick = cjBack;
+  bar.querySelectorAll('.cj-step').forEach(b => b.addEventListener('click', () => { cjState.mode = 'run'; cjState.cur = +b.dataset.st; cjRender(); }));
+}
+function cjDrawHead(R){
+  const sm = cjSummary(R), P = R.C.P;
+  const pill = (k, label, n) => '<span class="cj-stat"><i style="background:' + CJ_COL[k] + ';color:' + CJ_COL[k] + '"></i>' + label + ' <b>' + n + '</b></span>';
+  document.getElementById('cj-stats').innerHTML = pill('bad', 'Immediate Attention', sm.cnt.bad) + pill('warn', 'Needs Improvement', sm.cnt.warn) + pill('ok', 'On Track', sm.cnt.ok) + pill('none', 'Collecting Data', sm.cnt.none);
+  document.getElementById('cj-sub').textContent = (cjState.mode === 'sum' ? 'Click any stage to step through it' : 'Checking stage ' + (cjState.cur + 1) + ' of 8');
+}
+function cjRender(){
+  if(!cjState.R) return;
+  cjDrawMap(cjState.R); cjDrawBar(cjState.R); cjDrawHead(cjState.R);
+}
+function cjNext(){
+  if(cjState.mode === 'sum'){ cjState.mode = 'run'; cjState.cur = 0; }
+  else if(cjState.cur < 7) cjState.cur++;
+  else { cjState.mode = 'sum'; cjState.cur = -1; }
+  cjRender();
+}
+function cjBack(){
+  if(cjState.mode === 'run'){ if(cjState.cur > 0) cjState.cur--; else { cjState.mode = 'sum'; cjState.cur = -1; } }
+  cjRender();
+}
+function renderJourney(){
+  const host = document.getElementById('cj');
+  if(!host) return;
+  try {
+    const C = cjBuildContext(new Date());
+    cjState.R = cjEvaluate(C);
+    cjRender();
+  } catch(err){
+    console.error('Customer Journey Scorecard error', err);
+    document.getElementById('cj-bar').innerHTML = '<div style="grid-column:1/-1;padding:18px 22px;color:var(--muted)">The scorecard could not load. The rest of the dashboard is unaffected.</div>';
+  }
+}
+document.addEventListener('keydown', e => {
+  const panel = document.getElementById('cj');
+  if(!panel || !panel.contains(document.activeElement)) return;
+  if(e.target.closest && e.target.closest('summary, input, textarea')) return;
+  if(e.key === 'ArrowRight'){ e.preventDefault(); cjNext(); }
+  if(e.key === 'ArrowLeft'){ e.preventDefault(); cjBack(); }
+});
+
+/* Re-pull the sheets every 15 minutes (the syncs write that often) so the dashboard and the
+   scorecard stay live without a manual refresh. Skipped while the tab is in the background. */
+setInterval(()=>{ if(!document.hidden && GHL_ROWS.length){ loadDashboardDataAsync().catch(()=>{}); } }, 15*60*1000);
 </script>
 </body>
 </html>

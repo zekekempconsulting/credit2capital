@@ -60,8 +60,8 @@
     position:relative; z-index:5;
     width:min(420px, 88vw);
     padding:40px 36px 36px;
-    background:rgba(13,27,74,0.72);
-    border:1px solid var(--border);
+    background:rgba(13,27,74,0.80);
+    border:1px solid rgba(245,185,27,0.35);
     border-radius:20px;
     backdrop-filter:blur(18px);
     box-shadow:0 30px 90px rgba(0,0,0,0.55), 0 0 0 1px rgba(245,185,27,0.05) inset;
@@ -76,7 +76,7 @@
   #pw-input{
     width:100%; padding:16px 18px;
     background:rgba(6,11,30,0.8);
-    border:1px solid rgba(245,185,27,0.25);
+    border:1px solid rgba(245,185,27,0.45);
     border-radius:12px;
     color:var(--white); font-family:'IBM Plex Mono',monospace; font-size:16px;
     letter-spacing:0.05em;
@@ -273,9 +273,12 @@
     box-shadow:0 2px 14px rgba(16,26,61,0.05);
   }
   .kpi-card.gold{ border-color:rgba(185,134,11,0.3); }
-  .kpi-value{ font-family:'Space Grotesk',sans-serif; font-size:36px; font-weight:700; color:var(--light-ink); line-height:1.1; min-height:42px; }
+  .kpi-value{ font-family:'Space Grotesk',sans-serif; font-size:clamp(25px,2.7vw,36px); font-weight:700; color:var(--light-ink); line-height:1.1; min-height:42px; }
   .kpi-card.gold .kpi-value{ color:var(--gold-onlight); }
   .kpi-label{ font-size:13px; color:var(--light-muted); margin-top:8px; text-transform:uppercase; letter-spacing:0.04em; font-weight:600; }
+  /* The count that sits next to a percentage, e.g. 38% (28) */
+  .kpi-pct-wrap{ white-space:nowrap; display:inline-flex; align-items:baseline; }
+  .kpi-count{ font-size:0.4em; font-weight:600; color:var(--light-muted); margin-left:5px; letter-spacing:0; }
 
   .funnel-section{ margin-bottom:44px; }
   .funnel-row{ display:flex; flex-direction:column; gap:12px; }
@@ -359,6 +362,47 @@
   }
   .view-tab-btn:hover{ background:var(--gold-onlight); }
 
+  /* ---- Overview: Classic Grid (8 KPI cards, trend, funnel, recent leads, profitability) ---- */
+  .ov-grid-4{ display:grid; grid-template-columns:repeat(4,1fr); gap:16px; }
+  .ov-row{ display:grid; gap:16px; margin-top:16px; }
+  .ov-row.wide{ grid-template-columns:2fr 1fr; }
+  .ov-row.half{ grid-template-columns:1fr 1fr; }
+  .ov-card{
+    background:var(--light-card); border:1px solid var(--light-border); border-radius:14px;
+    padding:20px 22px; box-shadow:0 2px 10px rgba(var(--royal-rgb),0.07); min-width:0;
+  }
+  .ov-lbl{ font-size:12px; font-weight:600; letter-spacing:0.06em; text-transform:uppercase; color:var(--light-muted); }
+  .ov-val{ font-family:'Space Grotesk',sans-serif; font-size:clamp(28px,2.8vw,40px); font-weight:700; color:var(--royal-onlight); line-height:1.15; margin-top:4px; min-height:46px; }
+  .ov-val.accent{ color:var(--gold-onlight); }
+  .ov-sub{ font-size:12.5px; color:var(--light-muted); margin-top:2px; min-height:18px; }
+  .ov-head{ font-weight:700; font-size:15px; color:var(--light-ink); margin-bottom:12px; display:flex; justify-content:space-between; align-items:center; gap:10px; }
+  .ov-link{ background:none; border:none; padding:0; font-size:12px; font-weight:600; color:var(--gold-onlight); cursor:pointer; white-space:nowrap; }
+  .ov-link:hover{ text-decoration:underline; }
+  .ov-legend{ display:inline-flex; align-items:center; font-size:12px; font-weight:500; color:var(--light-muted); white-space:nowrap; }
+  .ov-lg{ display:inline-flex; align-items:center; gap:8px; margin-left:18px; line-height:1; }
+  .ov-dot{ width:10px; height:10px; border-radius:50%; display:inline-block; flex:0 0 10px; margin:0; }
+  .ov-pt{ position:absolute; transform:translateX(-50%); font-size:10.5px; font-weight:700; line-height:1; pointer-events:auto; white-space:nowrap; }
+  .ov-pt.lead{ color:var(--royal-onlight); }
+  .ov-pt.cust{ color:var(--gold-onlight); }
+  .ov-axis{ display:flex; justify-content:space-between; font-size:11px; color:var(--light-muted); margin-top:6px; }
+  .ov-line{ display:flex; justify-content:space-between; font-size:13px; font-weight:600; color:var(--light-ink); }
+  .ov-bar{ height:10px; border-radius:6px; background:rgba(var(--royal-rgb),0.08); overflow:hidden; margin:6px 0 12px; }
+  .ov-bar i{ display:block; height:100%; border-radius:6px; }
+  .ov-pl .ov-line{ padding:9px 0; border-bottom:1px solid rgba(var(--royal-rgb),0.08); }
+  .ov-pl .ov-line.total{ color:var(--gold-onlight); font-weight:700; border-bottom:none; }
+  .ov-table{ width:100%; border-collapse:collapse; font-size:13px; }
+  .ov-table th, .ov-table td{ padding:9px 6px; border-bottom:1px solid rgba(var(--royal-rgb),0.08); text-align:left; color:var(--light-ink); }
+  .ov-table th{ font-size:11px; color:var(--light-muted); text-transform:uppercase; letter-spacing:0.05em; font-weight:600; }
+  .ov-table tr:last-child td{ border-bottom:none; }
+  .ov-pill{ font-size:11px; font-weight:600; padding:3px 9px; border-radius:20px; background:rgba(var(--royal-rgb),0.09); color:var(--royal-onlight); white-space:nowrap; }
+  .ov-pill.next{ background:rgba(var(--gold-onlight-rgb),0.13); color:var(--gold-onlight); }
+  .ov-pill.won{ background:rgba(30,158,106,0.13); color:#127548; }
+  .ov-pill.cold{ background:rgba(16,26,61,0.06); color:var(--light-muted); }
+  @media (max-width:900px){
+    .ov-grid-4{ grid-template-columns:repeat(2,1fr); }
+    .ov-row.wide, .ov-row.half{ grid-template-columns:1fr; }
+  }
+
   .footer-note{
     font-size:13px; color:var(--light-muted); text-align:center; margin-top:20px;
     font-family:'IBM Plex Mono',monospace;
@@ -423,6 +467,18 @@
   }
   .calc-section{ padding:18px 26px; border-bottom:1px solid var(--light-border); }
   .calc-section:last-child{ border-bottom:none; }
+  /* Expand / Collapse: collapsed shows one result line per section; only the bottom line is bold. */
+  .calc-toolbar{ display:flex; justify-content:flex-end; padding:8px 26px 0; }
+  .calc-toggle{ background:none; border:1px solid var(--light-border); border-radius:20px; padding:6px 14px; font-size:12px; font-weight:600; color:var(--royal-onlight); cursor:pointer; }
+  .calc-toggle:hover{ background:rgba(var(--royal-rgb),0.06); }
+  .calc-wrap.collapsed .calc-section{ display:flex; justify-content:space-between; align-items:center; gap:16px; padding:14px 26px; }
+  .calc-wrap.collapsed .calc-section-title{ margin:0; }
+  .calc-wrap.collapsed .calc-solo .calc-label{ display:none; }
+  .calc-wrap.collapsed .calc-row:not(.calc-key){ display:none; }
+  .calc-wrap.collapsed .calc-row.calc-key{ border:none; margin:0; padding:0; gap:14px; justify-content:flex-end; }
+  .calc-wrap.collapsed .calc-row.calc-key:not(.calc-final) .calc-label{ color:var(--light-muted); font-weight:500; }
+  .calc-wrap.collapsed .calc-row.calc-key:not(.calc-final) .calc-value{ font-size:15px; font-weight:600; }
+  @media (max-width:600px){ .calc-wrap.collapsed .calc-section{ flex-direction:column; align-items:flex-start; gap:6px; } }
   .calc-section-title{
     font-family:'Space Grotesk',sans-serif; font-size:14.5px; font-weight:700; color:var(--light-ink);
     margin-bottom:12px; display:flex; align-items:center;
@@ -645,15 +701,15 @@
       </div>
       <div class="dash-meta">
         <div><span class="live-dot"></span>Live — synced automatically</div>
-        <div id="last-updated">Last updated —</div>
+        <div id="last-updated" style="margin-top:9px">Last updated —</div>
       </div>
     </div>
     <div class="tab-bar" id="tab-bar">
       <button class="tab-btn active" data-tab="overview">Overview</button>
-      <button class="tab-btn" data-tab="ghl">GoHighLevel</button>
-      <button class="tab-btn" data-tab="skool">Skool</button>
       <button class="tab-btn" data-tab="metaads">Meta Ads</button>
       <button class="tab-btn" data-tab="profitability">Paid Media Profitability</button>
+      <button class="tab-btn" data-tab="ghl">GoHighLevel</button>
+      <button class="tab-btn" data-tab="skool">Skool</button>
     </div>
   </div>
 
@@ -679,51 +735,41 @@
     <div class="tab-panel active" id="panel-overview">
       <div class="section-label">Overview</div>
 
-      <div class="overview-module">
-        <div class="card-accent" style="background:linear-gradient(90deg,var(--royal),var(--gold));"></div>
-        <div class="overview-module-body">
-          <div class="overview-module-header">
-            <div class="overview-section-title">GoHighLevel</div>
-            <button class="view-tab-btn" data-tab="ghl">View tab →</button>
+      <!-- Rows 1-2: eight KPI cards -->
+      <div class="ov-grid-4">
+        <div class="ov-card"><div class="ov-lbl">Total Spend</div><div class="ov-val" id="ov-spend">—</div><div class="ov-sub" id="ov-spend-sub"></div></div>
+        <div class="ov-card"><div class="ov-lbl">Leads</div><div class="ov-val" id="ov-leads">—</div><div class="ov-sub" id="ov-leads-sub"></div></div>
+        <div class="ov-card"><div class="ov-lbl">Cost Per Lead</div><div class="ov-val" id="ov-cpl">—</div><div class="ov-sub" id="ov-cpl-sub"></div></div>
+        <div class="ov-card"><div class="ov-lbl">% Qualified Leads</div><div class="ov-val" id="ov-qualified">—</div><div class="ov-sub" id="ov-qualified-sub"></div></div>
+        <div class="ov-card"><div class="ov-lbl">Customers</div><div class="ov-val accent" id="ov-customers">—</div><div class="ov-sub" id="ov-customers-sub"></div></div>
+        <div class="ov-card"><div class="ov-lbl">Cost Per Acquisition</div><div class="ov-val accent" id="ov-cac">—</div><div class="ov-sub" id="ov-cac-sub"></div></div>
+        <div class="ov-card"><div class="ov-lbl">Total Revenue</div><div class="ov-val" id="ov-revenue">—</div><div class="ov-sub" id="ov-revenue-sub"></div></div>
+        <div class="ov-card"><div class="ov-lbl">Net Profit</div><div class="ov-val accent" id="ov-net">—</div><div class="ov-sub" id="ov-net-sub"></div></div>
+      </div>
+
+      <!-- Row 3: trend + funnel -->
+      <div class="ov-row wide">
+        <div class="ov-card">
+          <div class="ov-head">Leads &amp; Customers Over Time
+            <span class="ov-legend"><span class="ov-lg"><i class="ov-dot" style="background:var(--royal-onlight)"></i>Leads</span><span class="ov-lg"><i class="ov-dot" style="background:var(--gold-onlight)"></i>Customers</span></span>
           </div>
-          <div class="kpi-grid cols-3" id="ov-ghl-kpi">
-            <div class="kpi-card"><div class="kpi-value" id="ov-ghl-total">—</div><div class="kpi-label">Total Opportunities</div></div>
-            <div class="kpi-card"><div class="kpi-value" id="ov-ghl-closerate">—</div><div class="kpi-label">Close Rate</div></div>
-            <div class="kpi-card gold"><div class="kpi-value" id="ov-ghl-revenue">—</div><div class="kpi-label">Won Revenue</div></div>
-          </div>
-          <div class="source-grid" id="ov-ghl-charts" style="grid-template-columns:1fr 1fr;"></div>
+          <div id="ov-trend"></div>
+        </div>
+        <div class="ov-card">
+          <div class="ov-head">Lead Funnel <button class="ov-link" data-tab="metaads">Meta Ads →</button></div>
+          <div id="ov-funnel"></div>
         </div>
       </div>
 
-      <div class="overview-module">
-        <div class="card-accent" style="background:linear-gradient(90deg,var(--royal),var(--gold));"></div>
-        <div class="overview-module-body">
-          <div class="overview-module-header">
-            <div class="overview-section-title">Meta Ads</div>
-            <button class="view-tab-btn" data-tab="metaads">View tab →</button>
-          </div>
-          <div class="kpi-grid cols-3" id="ov-meta-kpi">
-            <div class="kpi-card"><div class="kpi-value" id="ov-meta-spend">—</div><div class="kpi-label">Total Spend</div></div>
-            <div class="kpi-card"><div class="kpi-value" id="ov-meta-leads">—</div><div class="kpi-label">Leads</div></div>
-            <div class="kpi-card gold"><div class="kpi-value" id="ov-meta-cac">—</div><div class="kpi-label">Cost Per Acquisition</div></div>
-          </div>
-          <div class="source-grid" id="ov-meta-charts" style="grid-template-columns:1fr 1fr;"></div>
+      <!-- Row 4: recent leads + profitability -->
+      <div class="ov-row half">
+        <div class="ov-card">
+          <div class="ov-head">Recent Leads <button class="ov-link" data-tab="metaads">View All →</button></div>
+          <div id="ov-recent"></div>
         </div>
-      </div>
-
-      <div class="overview-module">
-        <div class="card-accent" style="background:linear-gradient(90deg,var(--royal),var(--gold));"></div>
-        <div class="overview-module-body">
-          <div class="overview-module-header">
-            <div class="overview-section-title">Skool</div>
-            <button class="view-tab-btn" data-tab="skool">View tab →</button>
-          </div>
-          <div class="kpi-grid cols-3" id="ov-skool-kpi">
-            <div class="kpi-card"><div class="kpi-value" id="ov-skool-members">—</div><div class="kpi-label">Members</div></div>
-            <div class="kpi-card gold"><div class="kpi-value" id="ov-skool-mrr">—</div><div class="kpi-label">MRR</div></div>
-            <div class="kpi-card"><div class="kpi-value" id="ov-skool-engagement">—</div><div class="kpi-label">Engagement</div></div>
-          </div>
-          <div class="source-grid" id="ov-skool-charts" style="grid-template-columns:1fr 1fr;"></div>
+        <div class="ov-card">
+          <div class="ov-head">Profitability <button class="ov-link" data-tab="profitability">Details →</button></div>
+          <div class="ov-pl" id="ov-pl"></div>
         </div>
       </div>
     </div>
@@ -912,10 +958,11 @@
         <div class="kpi-card gold"><div class="kpi-value" id="profit-kpi-netprofit">&mdash;</div><div class="kpi-label">Net Profit</div></div>
       </div>
 
-      <div class="calc-wrap" id="profit-calc-wrap">
+      <div class="calc-wrap collapsed" id="profit-calc-wrap">
+        <div class="calc-toolbar"><button class="calc-toggle" id="calc-toggle" aria-expanded="false">Expand All ▾</button></div>
         <div class="calc-section">
           <div class="calc-section-title">Volume<span class="info-tip" data-tip="How many clients came in during the selected date range.">i</span></div>
-          <div class="calc-row"><span class="calc-label">Total Clients</span><span class="calc-value" id="calc-volume">&mdash;</span></div>
+          <div class="calc-row calc-key calc-solo"><span class="calc-label">Total Clients</span><span class="calc-value" id="calc-volume">&mdash;</span></div>
         </div>
         <div class="calc-section">
           <div class="calc-section-title">Revenue &amp; Cost<span class="info-tip" data-tip="What clients are worth, minus what it costs to serve them, before counting any marketing spend.">i</span></div>
@@ -923,18 +970,18 @@
           <div class="calc-row"><span class="calc-label">Total Revenue</span><span class="calc-value" id="calc-totalrevenue">&mdash;</span></div>
           <div class="calc-row"><span class="calc-label">Cost to Serve per Client</span><span class="calc-value" id="calc-ctsperclient">&mdash;</span></div>
           <div class="calc-row"><span class="calc-label">Total Cost to Serve</span><span class="calc-value" id="calc-totalcts">&mdash;</span></div>
-          <div class="calc-row calc-total"><span class="calc-label">Margin (Before Media)</span><span class="calc-value" id="calc-marginbefore">&mdash;</span></div>
+          <div class="calc-row calc-total calc-key"><span class="calc-label">Margin (Before Media)</span><span class="calc-value" id="calc-marginbefore">&mdash;</span></div>
         </div>
         <div class="calc-section">
           <div class="calc-section-title">Media<span class="info-tip" data-tip="What was spent on Meta ads to generate leads and clients, plus what ZKC charges to run and manage the ads.">i</span></div>
           <div class="calc-row"><span class="calc-label">Ad Spend (period)</span><span class="calc-value" id="calc-adspend">&mdash;</span></div>
           <div class="calc-row"><span class="calc-label">Publisher Cost (period)</span><span class="calc-value" id="calc-publishercost">&mdash;</span></div>
-          <div class="calc-row calc-total"><span class="calc-label">Margin After Media &amp; Publisher</span><span class="calc-value" id="calc-marginafter">&mdash;</span></div>
+          <div class="calc-row calc-total calc-key"><span class="calc-label">Margin After Media &amp; Publisher</span><span class="calc-value" id="calc-marginafter">&mdash;</span></div>
         </div>
         <div class="calc-section">
           <div class="calc-section-title">Overhead &amp; Bottom Line<span class="info-tip" data-tip="The day-to-day cost of running C2C's business, applied across the whole period, regardless of channel.">i</span></div>
           <div class="calc-row"><span class="calc-label" id="calc-overhead-label">Business Overhead (period)</span><span class="calc-value" id="calc-overhead">&mdash;</span></div>
-          <div class="calc-row calc-total calc-final"><span class="calc-label">Profit After All Charges</span><span class="calc-value" id="calc-profitfinal">&mdash;</span></div>
+          <div class="calc-row calc-total calc-final calc-key"><span class="calc-label">Profit After All Charges</span><span class="calc-value" id="calc-profitfinal">&mdash;</span></div>
         </div>
       </div>
 
@@ -977,7 +1024,7 @@
       <button class="view-log-close" id="view-log-close">&times;</button>
     </div>
     <div class="view-log-count" id="view-log-count">&mdash;</div>
-    <div class="view-log-sub">total times the dashboard has been opened</div>
+    <div class="view-log-sub" id="view-log-sub">times the dashboard was opened this week · resets every Monday</div>
   </div>
 </div></div>
 
@@ -1165,6 +1212,13 @@ function startLoading(){
     }, remaining);
   });
 }
+
+/* C2C brand colors used by the Overview SVG chart (same values as the CSS variables). */
+const BRAND = { primary:'#244FC4', accentOnLight:'#B9860B' };
+function hexToRgb(hex){ const n = parseInt(String(hex).replace('#',''), 16); return [(n>>16)&255, (n>>8)&255, n&255].join(','); }
+
+/* Percentage with its count beside it, e.g. 38% (28). */
+function pctWithCount(pct, count){ return '<span class="kpi-pct-wrap">' + pct + '%<span class="kpi-count">(' + count.toLocaleString() + ')</span></span>'; }
 
 /* ---------- Stage normalization ---------- */
 function normalizeStage(raw){
@@ -1493,7 +1547,17 @@ document.getElementById('campaign-daily-toggle').addEventListener('click', funct
 document.querySelectorAll('.tab-btn').forEach(btn=>{
   btn.addEventListener('click', ()=> switchTab(btn.dataset.tab));
 });
-document.querySelectorAll('.view-tab-btn').forEach(btn=>{
+/* Paid Media Profitability: Expand All / Collapse All */
+(function(){
+  const btn = document.getElementById('calc-toggle'), wrap = document.getElementById('profit-calc-wrap');
+  if(!btn || !wrap) return;
+  btn.addEventListener('click', () => {
+    const collapsed = wrap.classList.toggle('collapsed');
+    btn.textContent = collapsed ? 'Expand All ▾' : 'Collapse All ▴';
+    btn.setAttribute('aria-expanded', String(!collapsed));
+  });
+})();
+document.querySelectorAll('.view-tab-btn, .ov-link').forEach(btn=>{
   btn.addEventListener('click', ()=> switchTab(btn.dataset.tab));
 });
 function switchTab(tab){
@@ -1516,10 +1580,20 @@ function switchTab(tab){
    counter just silently stops updating -- nothing else on the dashboard
    is affected either way. */
 const VIEW_COUNTER_NAMESPACE = 'c2c-dashboard-zkc';
-const VIEW_COUNTER_KEY = 'opens';
+/* Weekly reset: the counter key carries the date of the current week's Monday
+   (US Eastern time), so a brand-new counter starts every Monday on its own. */
+function weeklyCounterInfo(){
+  const ymd = new Date().toLocaleDateString('en-CA', { timeZone:'America/New_York' }).split('-').map(Number);
+  const d = new Date(Date.UTC(ymd[0], ymd[1]-1, ymd[2]));
+  d.setUTCDate(d.getUTCDate() - ((d.getUTCDay() + 6) % 7));   // back up to Monday
+  const iso = d.toISOString().slice(0,10);
+  const label = d.toLocaleDateString('en-US', { month:'short', day:'numeric', timeZone:'UTC' });
+  return { key:'opens-' + iso, label:label };
+}
+
 
 function pingDashboardView(){
-  fetch(`https://abacus.jasoncameron.dev/hit/${VIEW_COUNTER_NAMESPACE}/${VIEW_COUNTER_KEY}`, { mode: 'cors' }).catch(()=>{});
+  fetch(`https://abacus.jasoncameron.dev/hit/${VIEW_COUNTER_NAMESPACE}/${weeklyCounterInfo().key}`, { mode: 'cors' }).catch(()=>{});
 }
 
 const zkcTrigger = document.getElementById('zkc-trigger');
@@ -1544,8 +1618,11 @@ function openViewCounterPanel(){
   viewLogOverlay.classList.add('open');
   const countEl = document.getElementById('view-log-count');
   countEl.textContent = '\u2026';
-  fetch(`https://abacus.jasoncameron.dev/get/${VIEW_COUNTER_NAMESPACE}/${VIEW_COUNTER_KEY}`, { mode: 'cors' })
-    .then(res => { if(!res.ok) throw new Error('fetch failed'); return res.json(); })
+  const wk = weeklyCounterInfo();
+  const subEl = document.getElementById('view-log-sub');
+  if(subEl) subEl.textContent = 'times the dashboard was opened this week (since Mon, ' + wk.label + ') \u00b7 resets every Monday';
+  fetch(`https://abacus.jasoncameron.dev/get/${VIEW_COUNTER_NAMESPACE}/${wk.key}`, { mode: 'cors' })
+    .then(res => { if(res.status === 404) return { value: 0 }; if(res.ok === false) throw new Error('fetch failed'); return res.json(); })
     .then(data => { countEl.textContent = (data && typeof data.value === 'number') ? data.value.toLocaleString() : '\u2014'; })
     .catch(()=>{ countEl.textContent = '\u2014'; });
 }
@@ -1559,9 +1636,9 @@ function applyFilterAndRenderAll(){
   const ghlSummary = renderGHL(ghlRows);
   const metaSummary = renderMetaAds(metaRows, ghlRows);
   const skoolSummary = renderSkool(skoolRows);
-  renderOverview(ghlRows, ghlSummary, metaSummary, skoolSummary);
   renderClarity(clarityOverviewRows, clarityBreakdownRows);
-  renderProfitability(ghlRows, ghlSummary, metaSummary, skoolSummary);
+  const profitSummary = renderProfitability(ghlRows, ghlSummary, metaSummary, skoolSummary);
+  renderOverview(metaSummary, profitSummary);
   try{ renderJourney(); }catch(e){ console.error(e); }
 }
 
@@ -1801,7 +1878,7 @@ function renderMetaLeadsChart(){
         }
       },
       plugins: {
-        legend: { display: true, position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 8, padding: 18, font: { family: 'Inter', size: 12.5 }, color: '#5C6690' } },
+        legend: { display: true, position: 'top', align: 'end', labels: { usePointStyle: true, boxWidth: 8, boxHeight: 8, boxPadding: 8, padding: 22, font: { family: 'Inter', size: 12.5 }, color: '#5C6690' } },
         tooltip: { backgroundColor: '#101a3d', padding: 10, titleFont: {family:'Inter'}, bodyFont: {family:'Inter'} },
         datalabels: {
           align: 'top', anchor: 'end', offset: 4,
@@ -1870,8 +1947,8 @@ function renderMetaAds(rows, ghlRows){
   document.getElementById('meta-kpi-spend').textContent = '$' + totalSpend.toLocaleString(undefined,{maximumFractionDigits:2});
   document.getElementById('meta-kpi-leads').textContent = totalLeads.toLocaleString();
   document.getElementById('meta-kpi-cpl').textContent = totalLeads ? '$' + cpl.toFixed(2) : '—';
-  document.getElementById('meta-kpi-qualified').textContent = pctQualified !== null ? pctQualified + '%' : '';
-  document.getElementById('meta-kpi-salesready').textContent = pctSalesReady !== null ? pctSalesReady + '%' : '';
+  document.getElementById('meta-kpi-qualified').innerHTML = pctQualified !== null ? pctWithCount(pctQualified, qualifiedOrBeyond) : '';
+  document.getElementById('meta-kpi-salesready').innerHTML = pctSalesReady !== null ? pctWithCount(pctSalesReady, salesReadyOrBeyond) : '';
   document.getElementById('meta-kpi-customers').textContent = customers;
   document.getElementById('meta-kpi-cac').textContent = cac !== null ? '$' + cac.toFixed(2) : '—';
 
@@ -1925,7 +2002,7 @@ function renderMetaAds(rows, ghlRows){
   renderCampaignTotal();
   renderMetaStageBreakdown(uniqueMetaLeads);
 
-  return { totalSpend, totalLeads, cpl, customers, cac };
+  return { totalSpend, totalLeads, cpl, customers, cac, hasSpend: rows.length > 0, pctQualified, qualifiedOrBeyond, salesReadyOrBeyond, leads: uniqueMetaLeads };
 }
 
 
@@ -2291,6 +2368,8 @@ function renderProfitability(ghlRows, ghlSummary, metaSummary, skoolSummary){
   }
   document.getElementById('profit-client-pageinfo').textContent =
     sortedWon.length ? `Showing ${page.length} of ${sortedWon.length}` : '';
+
+  return { clients, totalRevenue, totalCts: costToServeTotal, publisherCost, overhead, adSpend, profitFinal };
 }
 
 /* ---------- Meta Ads tab: Clarity site-behavior section ---------- */
@@ -2403,92 +2482,111 @@ function renderClarity(overviewRows, breakdownRows){
     breakdownCard('Campaign', 'Campaign');
 }
 
-/* ---------- Overview tab: stacked, scrollable sections ---------- */
-function renderOverview(ghlRows, ghlSummary, metaSummary, skoolSummary){
-  document.getElementById('ov-ghl-total').textContent = ghlSummary.totalCount;
-  document.getElementById('ov-ghl-closerate').textContent = ghlSummary.closeRate + '%';
-  document.getElementById('ov-ghl-revenue').textContent = '$' + ghlSummary.wonRevenue.toLocaleString();
-
-  const dedupedGhlRows = dedupeContactsMostRecent(ghlRows);
-  const won = dedupedGhlRows.filter(r=>(r['Normalized Stage']||normalizeStage(r['Raw Stage']))==='Closed Won').length;
-  const dead = dedupedGhlRows.filter(r=>{
-    const s = r['Normalized Stage']||normalizeStage(r['Raw Stage']);
-    return s==='Unqualified / Nurture' || s==='No Show';
-  }).length;
-  const active = Math.max(dedupedGhlRows.length - won - dead, 0);
-  const repEntries = Object.keys(ghlSummary.reps||{}).map(name=>{
-    const d = ghlSummary.reps[name];
-    const cr = d.total ? Math.round((d.closed/d.total)*100) : 0;
-    return {label:name, value:cr, display:cr+'%', color:'var(--royal-onlight)'};
-  });
-
-  document.getElementById('ov-ghl-charts').innerHTML = `
-    <div class="source-card">
-      <div class="card-accent" style="background:linear-gradient(90deg,var(--royal),var(--gold));"></div>
-      <div class="source-card-body">
-        <div class="source-card-name">Pipeline Health</div>
-        <div style="display:flex;align-items:center;gap:16px;">
-          ${svgDonut([{value:won,color:'var(--gold-onlight)'},{value:active,color:'var(--royal-onlight)'},{value:dead,color:'var(--neutral-tint)'}])}
-          ${svgLegend([{label:'Won',value:won,color:'var(--gold-onlight)'},{label:'Active',value:active,color:'var(--royal-onlight)'},{label:'Dead',value:dead,color:'var(--neutral-tint)'}])}
-        </div>
-      </div>
-    </div>
-    <div class="source-card">
-      <div class="card-accent" style="background:linear-gradient(90deg,var(--royal),var(--gold));"></div>
-      <div class="source-card-body">
-        <div class="source-card-name">Close Rate by Rep</div>
-        ${repEntries.length ? svgBarList(repEntries) : '<div style="color:var(--light-muted);font-size:13.5px;">No rep activity in this date range.</div>'}
-      </div>
-    </div>`;
-
-  document.getElementById('ov-meta-spend').textContent = '$' + metaSummary.totalSpend.toLocaleString(undefined,{maximumFractionDigits:2});
-  document.getElementById('ov-meta-leads').textContent = metaSummary.totalLeads.toLocaleString();
-  document.getElementById('ov-meta-cac').textContent = metaSummary.cac !== null ? '$'+metaSummary.cac.toFixed(2) : '—';
-
-  const conversionRate = metaSummary.totalLeads ? (metaSummary.customers/metaSummary.totalLeads*100) : 0;
-  document.getElementById('ov-meta-charts').innerHTML = `
-    <div class="source-card">
-      <div class="card-accent" style="background:linear-gradient(90deg,var(--royal),var(--gold));"></div>
-      <div class="source-card-body">
-        <div class="source-card-name">Lead Volume</div>
-        ${svgBarList([
-          {label:'Leads', value: metaSummary.totalLeads, color:'var(--royal-onlight)'},
-          {label:'Customers', value: metaSummary.customers, color:'var(--gold-onlight)'}
-        ])}
-      </div>
-    </div>
-    <div class="source-card">
-      <div class="card-accent" style="background:linear-gradient(90deg,var(--royal),var(--gold));"></div>
-      <div class="source-card-body" style="align-items:center;text-align:center;">
-        <div class="source-card-name">Lead-to-Customer Rate</div>
-        ${svgRingGauge(conversionRate, 120, 14, '#244FC4')}
-        <div class="source-stat-label">Share of Meta leads that closed as customers</div>
-      </div>
-    </div>`;
-
-  document.getElementById('ov-skool-members').textContent = skoolSummary.members;
-  document.getElementById('ov-skool-mrr').textContent = '$' + (parseFloat(skoolSummary.mrr)||0).toLocaleString();
-  document.getElementById('ov-skool-engagement').textContent = skoolSummary.engagement;
-
-  document.getElementById('ov-skool-charts').innerHTML = `
-    <div class="source-card">
-      <div class="card-accent" style="background:linear-gradient(90deg,var(--royal),var(--gold));"></div>
-      <div class="source-card-body" style="align-items:center;text-align:center;">
-        <div class="source-card-name">Engagement</div>
-        ${svgRingGauge(parseFloat(skoolSummary.engagement)||0, 120, 14, '#244FC4')}
-        <div class="source-stat-label">Share of members active this period</div>
-      </div>
-    </div>
-    <div class="source-card">
-      <div class="card-accent" style="background:linear-gradient(90deg,var(--royal),var(--gold));"></div>
-      <div class="source-card-body" style="align-items:center;text-align:center;">
-        <div class="source-card-name">Retention</div>
-        ${svgRingGauge(parseFloat(skoolSummary.retention)||0, 120, 14, '#B9860B')}
-        <div class="source-stat-label">Members retained vs. last period</div>
-      </div>
-    </div>`;
+/* ---------- Overview tab: Classic Grid ----------
+   Everything here reuses the numbers the Meta Ads and Profitability tabs
+   already calculated (metaSummary / profitSummary), so the Overview can
+   never disagree with the other tabs. No new data is required. */
+function ovSetSub(id, text){ const el = document.getElementById(id); if(el) el.textContent = text || ''; }
+function ovDayKey(d){ return d.getFullYear() + '-' + String(d.getMonth()+1).padStart(2,'0') + '-' + String(d.getDate()).padStart(2,'0'); }
+/* Leads and customers per day (or per week when the range is longer than 28 days), by lead date. */
+function ovTrendSeries(leads){
+  const dated = leads.map(r => ({ d: parseDateSafe(r['Created At']), won: leadStage(r) === 'Closed Won' })).filter(x => !isNaN(x.d));
+  if(!dated.length) return null;
+  const min = new Date(Math.min.apply(null, dated.map(x=>x.d)));
+  const max = new Date(Math.max.apply(null, dated.map(x=>x.d)));
+  const spanDays = Math.round((max - min) / 86400000) + 1;
+  const weekly = spanDays > 28;
+  const bucketStart = d => weekly ? weekStartSunday(d) : new Date(d.getFullYear(), d.getMonth(), d.getDate());
+  const buckets = [];
+  for(let cur = bucketStart(min); cur <= max; cur = new Date(cur.getFullYear(), cur.getMonth(), cur.getDate() + (weekly ? 7 : 1))){
+    buckets.push({ key: ovDayKey(cur), date: cur, leads: 0, customers: 0 });
+  }
+  const idx = {}; buckets.forEach((b,i) => idx[b.key] = i);
+  dated.forEach(x => { const b = buckets[idx[ovDayKey(bucketStart(x.d))]]; if(b){ b.leads++; if(x.won) b.customers++; } });
+  return { buckets, weekly };
 }
+function ovTrendSvg(t){
+  const W = 600, H = 210, top = 28, bottom = 172, left = 14, right = 586;
+  const n = t.buckets.length;
+  const maxY = Math.max(1, ...t.buckets.map(b => b.leads));
+  const x = i => n <= 1 ? (left+right)/2 : left + (right-left) * i / (n-1);
+  const y = v => bottom - (v / maxY) * (bottom - top);
+  const pts = key => t.buckets.map((b,i) => x(i).toFixed(1) + ',' + y(b[key]).toFixed(1)).join(' ');
+  let grid = '';
+  for(let g=0; g<=3; g++){ const gy = top + (bottom-top)*g/3; grid += `<line x1="${left}" x2="${right}" y1="${gy}" y2="${gy}" stroke="rgba(${hexToRgb(BRAND.primary)},0.08)" vector-effect="non-scaling-stroke"/>`; }
+  const area = `${x(0).toFixed(1)},${bottom} ${pts('leads')} ${x(n-1).toFixed(1)},${bottom}`;
+  /* Numbers sit right on the chart: leads above each point, customers below. */
+  const lab = (key, cls, dy) => t.buckets.map((b,i) => {
+    const tip = b.date.toLocaleDateString(undefined, { month:'short', day:'numeric' }) + ': ' + b[key] + ' ' + key;
+    return `<span class="ov-pt ${cls}" title="${tip}" style="left:${(x(i)/W*100).toFixed(2)}%;top:${(y(b[key]) + dy).toFixed(1)}px">${b[key]}</span>`;
+  }).join('');
+  return `<div class="ov-chart" style="position:relative;height:${H}px">
+    <svg width="100%" height="${H}" viewBox="0 0 ${W} ${H}" preserveAspectRatio="none" style="display:block;overflow:visible;position:absolute;left:0;top:0">
+    <defs><linearGradient id="ov-area" x1="0" y1="0" x2="0" y2="1"><stop offset="0" stop-color="${BRAND.primary}" stop-opacity=".18"/><stop offset="1" stop-color="${BRAND.primary}" stop-opacity="0"/></linearGradient></defs>
+    ${grid}
+    <polygon points="${area}" fill="url(#ov-area)"/>
+    <polyline points="${pts('leads')}" fill="none" stroke="${BRAND.primary}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+    <polyline points="${pts('customers')}" fill="none" stroke="${BRAND.accentOnLight}" stroke-width="3" stroke-linejoin="round" stroke-linecap="round" vector-effect="non-scaling-stroke"/>
+  </svg>${lab('leads','lead',-22)}${lab('customers','cust',8)}</div>`;
+}
+function ovPillClass(key){ return { appt:'next', won:'won', cold:'cold' }[key] || ''; }
+function ovStageLabel(r){ const k = stageGroupKey(leadStage(r)); const g = STAGE_GROUPS.find(x => x.key === k); return { key:k, label: g ? g.label : (leadStage(r) || 'Other') }; }
+function renderOverview(metaSummary, profitSummary){
+  const ms = metaSummary, ps = profitSummary;
+  const plural = (n, w) => n.toLocaleString() + ' ' + w + (n === 1 ? '' : 's');
+  const set = (id, html) => { const el = document.getElementById(id); if(el) el.innerHTML = html; };
 
+  /* KPI cards */
+  set('ov-spend', money(ms.totalSpend));                 ovSetSub('ov-spend-sub', 'Meta Ads');
+  set('ov-leads', ms.totalLeads.toLocaleString());       ovSetSub('ov-leads-sub', 'From Meta Ads');
+  set('ov-cpl', ms.totalLeads ? money(ms.cpl) : '—');    ovSetSub('ov-cpl-sub', ms.totalLeads ? 'Spend ÷ leads' : '');
+  set('ov-qualified', ms.pctQualified !== null ? ms.pctQualified + '%' : '—');
+  ovSetSub('ov-qualified-sub', ms.pctQualified !== null ? plural(ms.qualifiedOrBeyond, 'qualified lead') : '');
+  set('ov-customers', ms.customers.toLocaleString());
+  ovSetSub('ov-customers-sub', ms.totalLeads ? Math.round(ms.customers / ms.totalLeads * 100) + '% of leads' : '');
+  set('ov-cac', ms.cac !== null ? money(ms.cac) : '—'); ovSetSub('ov-cac-sub', ms.cac !== null ? 'Spend ÷ customers' : '');
+  set('ov-revenue', money(ps.totalRevenue));             ovSetSub('ov-revenue-sub', 'From ' + plural(ps.clients, 'client'));
+  set('ov-net', money(ps.profitFinal));                  ovSetSub('ov-net-sub', 'After ads, publisher cost and overhead');
+
+  /* Leads & Customers Over Time */
+  const t = ovTrendSeries(ms.leads || []);
+  const fmt = d => d.toLocaleDateString(undefined, { month:'short', day:'numeric' });
+  set('ov-trend', t
+    ? ovTrendSvg(t) + `<div class="ov-axis"><span>${fmt(t.buckets[0].date)}</span><span>${t.weekly ? 'By Week' : 'By Day'}</span><span>${fmt(t.buckets[t.buckets.length-1].date)}</span></div>`
+    : '<div style="color:var(--light-muted);font-size:13.5px;">No Meta leads in this date range.</div>');
+
+  /* Lead Funnel: Leads -> Qualified -> Sales-Ready -> Customers */
+  const steps = [
+    { label:'Leads',           value: ms.totalLeads,              color: BRAND.primary },
+    { label:'Qualified Leads', value: ms.qualifiedOrBeyond || 0,  color: BRAND.primary },
+    { label:'Sales-Ready',     value: ms.salesReadyOrBeyond || 0, color: 'color-mix(in srgb, ' + BRAND.primary + ' 35%, #D3D8E0)' },
+    { label:'Customers',       value: ms.customers || 0,          color: BRAND.accentOnLight }
+  ];
+  set('ov-funnel', ms.totalLeads
+    ? steps.map(st => `<div class="ov-line"><span>${st.label}</span><span>${st.value.toLocaleString()}</span></div>
+        <div class="ov-bar"><i style="width:${Math.round(st.value / ms.totalLeads * 100)}%;background:${st.color}"></i></div>`).join('')
+    : '<div style="color:var(--light-muted);font-size:13.5px;">No Meta leads in this date range.</div>');
+
+  /* Recent Leads: newest 5 Meta leads */
+  const recent = [...(ms.leads || [])].sort((a,b) => parseDateSafe(b['Created At']) - parseDateSafe(a['Created At'])).slice(0, 5);
+  set('ov-recent', recent.length
+    ? `<table class="ov-table"><tr><th>Lead</th><th>Created</th><th>Stage</th></tr>` +
+      recent.map(r => {
+        const d = parseDateSafe(r['Created At']);
+        const st = ovStageLabel(r);
+        return `<tr><td style="font-weight:600">${toTitleCase(r['Opportunity Name']) || r['Contact ID'] || '—'}</td><td>${isNaN(d) ? '—' : d.toLocaleDateString()}</td><td><span class="ov-pill ${ovPillClass(st.key)}">${st.label}</span></td></tr>`;
+      }).join('') + `</table>`
+    : '<div style="color:var(--light-muted);font-size:13.5px;">No Meta leads in this date range.</div>');
+
+  /* Profitability summary (same math as the Profitability tab) */
+  const line = (label, val, neg, cls) => `<div class="ov-line ${cls||''}"><span>${label}</span><span>${(neg ? '−' : '') + money(val)}</span></div>`;
+  set('ov-pl',
+    line('Revenue', ps.totalRevenue) +
+    line('Cost To Serve', ps.totalCts, true) +
+    line('Ad Spend', ps.adSpend, true) +
+    line('Publisher Cost + Overhead', ps.publisherCost + ps.overhead, true) +
+    line('Net Profit', ps.profitFinal, false, 'total'));
+}
 
 
 /* ============================================================
@@ -2982,6 +3080,22 @@ function cjDefs(){
   });
   return d + '</defs>';
 }
+/* Wrap a caption onto extra centered lines so it never runs into the next stage. */
+let cjMeasureCtx = null;
+function cjTextW(t){
+  try{
+    if(!cjMeasureCtx) cjMeasureCtx = document.createElement('canvas').getContext('2d');
+    cjMeasureCtx.font = '400 11px ' + (getComputedStyle(document.body).fontFamily || 'sans-serif');
+    return cjMeasureCtx.measureText(t).width;
+  }catch(e){ return t.length * 6.2; }
+}
+function cjWrap(text, maxW){
+  const words = String(text || '').split(/\s+/).filter(Boolean), lines = [];
+  let cur = '';
+  words.forEach(w => { const test = cur ? cur + ' ' + w : w; if(cur && cjTextW(test) > maxW){ lines.push(cur); cur = w; } else cur = test; });
+  if(cur) lines.push(cur);
+  return lines.length ? lines : [''];
+}
 function cjDrawMap(R){
   const S = R.stages, st = cjState, run = st.mode === 'run';
   const showBox = i => st.mode === 'sum' || (run && st.seen.has(i));
@@ -3021,8 +3135,9 @@ function cjDrawMap(R){
     if(isSrc){ const w = FL[i].length > 16 ? 156 : 128; g += '<g filter="url(#cj-soft)"><rect x="' + (x-w/2) + '" y="' + (CJ_NY-CJ_R-34) + '" width="' + w + '" height="22" rx="11" fill="var(--bad)"/></g><text x="' + x + '" y="' + (CJ_NY-CJ_R-19) + '" text-anchor="middle" font-size="10.5" font-weight="700" letter-spacing="1" fill="#fff" font-family="var(--f-mono)">' + FL[i] + '</text>'; }
     const nm = s.name.split(' '), two = nm.length > 1 && s.name.length > 12;
     g += '<text x="' + x + '" y="' + (CJ_NY+CJ_R+24) + '" text-anchor="middle" font-size="13.5" font-weight="600" fill="var(--ink)" font-family="var(--f-body)">' + (two ? '<tspan x="' + x + '">' + cjEsc(nm[0]) + '</tspan><tspan x="' + x + '" dy="16">' + cjEsc(nm.slice(1).join(' ')) + '</tspan>' : cjEsc(s.name)) + '</text>';
-    g += '<text x="' + x + '" y="' + (CJ_NY+CJ_R+(two ? 58 : 42)) + '" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="var(--f-body)">' + cjEsc(s.lc) + '</text>';
-    const by = CJ_NY + CJ_R + 72, rows = cjBoxRows(s), bh = rows.length * 44 + 12, bc = CJ_COL[k];
+    const capY = CJ_NY + CJ_R + (two ? 58 : 42), capLines = cjWrap(s.lc, CJ_BW - 6), capEnd = capY + (capLines.length - 1) * 14;
+    g += '<text x="' + x + '" y="' + capY + '" text-anchor="middle" font-size="11" fill="var(--muted)" font-family="var(--f-body)">' + capLines.map((ln, li) => '<tspan x="' + x + '" dy="' + (li ? 14 : 0) + '">' + cjEsc(ln) + '</tspan>').join('') + '</text>';
+    const by = Math.max(CJ_NY + CJ_R + 72, capEnd + 18), rows = cjBoxRows(s), bh = rows.length * 44 + 12, bc = CJ_COL[k];
     if(!showBox(i)){ g += '</g>'; return; }
     maxBottom = Math.max(maxBottom, by + bh);
     g += '<g class="cj-pop"><rect x="' + (x-CJ_BW/2) + '" y="' + by + '" width="' + CJ_BW + '" height="' + bh + '" rx="10" fill="var(--box)" stroke="var(--boxline)" filter="url(#cj-soft)"/>';
